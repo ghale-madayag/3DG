@@ -36,7 +36,7 @@
     import Layout from "@/Layouts/main.vue";
     import PageHeader from "@/Components/page-header.vue";
     import { ref, onMounted, computed } from 'vue';
-    import VueInputMask from 'vue-inputmask';
+    // import VueInputMask from 'vue-inputmask';
     import { Grid, h } from "gridjs";
     import "gridjs/dist/theme/mermaid.css";
     import Swal from 'sweetalert2/dist/sweetalert2';
