@@ -55,7 +55,7 @@
 
                             <div class="mb-3">
                                 <label for="phone" class="form-label">Phone</label>
-                                <input v-model="form.phone" v-mask="'(##)-###-###-####'" :class="{ 'is-invalid': form.errors.phone }" id="phone" type="text" class="form-control" placeholder="(63)-###-###-####" required />
+                                <!-- <input v-model="form.phone" v-mask="'(##)-###-###-####'" :class="{ 'is-invalid': form.errors.phone }" id="phone" type="text" class="form-control" placeholder="(63)-###-###-####" required /> -->
                                 <div class="invalid-feedback">{{ form.errors.phone  }}</div>
                             </div>
                             <div class="mb-3">
@@ -90,7 +90,7 @@
     import Layout from "@/Layouts/main.vue";
     import PageHeader from "@/Components/page-header.vue";
     import { ref, onMounted, computed } from 'vue';
-    import VueInputMask from 'vue-inputmask';
+    // import VueInputMask from 'vue-inputmask';
     import { Grid, h } from "gridjs";
     import "gridjs/dist/theme/mermaid.css";
 
