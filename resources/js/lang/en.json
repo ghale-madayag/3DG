@@ -215,5 +215,6 @@
     "t-contact": "Contact",
     "t-client": "Client",
     "t-agent": "Agent",
-    "t-transaction": "Transaction"
+    "t-transaction": "Transaction",
+    "t-user": "User"
 }

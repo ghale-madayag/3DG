@@ -7,7 +7,15 @@
         <div class="row mb-3">
             <div class="col-lg-8">
                 <AlertMsg v-if="message" :type="'success'" :msg="message"/>
-                <Link :href="'/land/create'" class="btn btn-success w-sm"><i class="ri-add-line align-bottom me-1"></i> Add New</Link>
+                <div class="d-flex align-items-center flex-wrap gap-2">
+                    <div class="flex-shrink-0">
+                        <div class="hstack text-nowrap gap-2">
+                            <button class="btn btn-soft-danger" id="remove-actions" onclick="deleteMultiple()"><i class="ri-delete-bin-2-line"></i></button>
+                            <Link :href="'/land/create'" class="btn btn-success w-sm"><i class="ri-add-line align-bottom me-1"></i> Add New</Link>
+                            <Link :href="'/land/'+land.slug" class="btn btn-soft-success w-sm"><i class="ri-eye-line"></i> View</Link>
+                        </div>
+                    </div>
+            </div>
             </div>
         </div>
         <div class="row">
@@ -22,8 +30,9 @@
 
                         <div class="mb-3">
                             <label class="form-label" for="description">Description</label>
-                           <textarea v-model="form.description" class="form-control" id="description" rows="5">
-                           </textarea>
+                            <ckeditor :editor="editor" v-model="form.description" :config="editorConfig"></ckeditor>
+                           <!-- <textarea v-model="form.description" class="form-control" id="description" rows="5">
+                           </textarea> -->
                         </div>
                         <div class="row">
                             <div class="col-lg-4">
@@ -168,6 +177,25 @@
     import '@vueform/multiselect/themes/default.css';
     import Swal from 'sweetalert2/dist/sweetalert2';
     import 'sweetalert2/dist/sweetalert2.min.css';
+    import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
+
+    const editor = ClassicEditor;
+    const editorConfig = {
+            toolbar: {
+                items: [
+                    'bold',
+                    'italic',
+                    'numberedList',
+                    'bulletedList',
+                    'indent',
+                    'outdent', 
+                    'link',
+                    'undo',
+                    'redo'
+                ]
+            }
+    }
+
 
     const dropRef = ref(null);
     let dropPreview = ref();

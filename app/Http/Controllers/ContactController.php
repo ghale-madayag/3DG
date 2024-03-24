@@ -2,12 +2,25 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\UserRegistered;
 use App\Models\Contact;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Facades\Redirect;
 use Inertia\Inertia;
+use Laravel\Fortify\Contracts\CreatesNewUsers;
+use Illuminate\Support\Str;
+use App\Mail\WelcomeEmail;
+use Illuminate\Support\Facades\Mail;
 
 class ContactController extends Controller
 {
+    protected $creator;
+
+    public function __construct(CreatesNewUsers $creator)
+    {
+        $this->creator = $creator;
+    }
     /**
      * Display a listing of the resource.
      */
@@ -37,9 +50,19 @@ class ContactController extends Controller
      */
     public function store(Request $request)
     {
-        $request['phone'] = $this->sanitizePhoneNumber($request->input('phone'));
-        $validatedData = $request->validate($this->getValidationRules());   
-        Contact::create($validatedData);
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users',
+        ]);
+
+        $password = Str::random(8); // Adjust the length of the password as needed
+        $user = $this->creator->create(array_merge($request->only(['name', 'email']), ['password' => $password]));
+        $user['password'] = $password;
+
+        Mail::to($user)->send(new WelcomeEmail($user));
+
+        dd($user);
+
     }
 
     /**
@@ -63,7 +86,7 @@ class ContactController extends Controller
      */
     public function update(Request $request, Contact $contact)
     {
-        $request['phone'] = $this->sanitizePhoneNumber($request->input('phone'));
+        //$request['phone'] = $this->sanitizePhoneNumber($request->input('phone'));
         $validatedData = $request->validate($this->getValidationRules($contact));   
         
         $contact->update($validatedData); // Update the contact with validated data
@@ -82,6 +105,7 @@ class ContactController extends Controller
         $ids = $request->input('id');
 
         Contact::whereIn('id', $ids)->delete();
+        return redirect('/contact');
     }
 
     private function getValidationRules($contact = null)
@@ -89,7 +113,7 @@ class ContactController extends Controller
         $rules = [
             'fname' => ['required', 'max:50'],
             'lname' => ['required', 'max:50'],
-            'phone' => ['required', 'max:50', 'regex:/^\d{12}$/'],
+            'phone' => ['required', 'max:50'],
             'email' => ['required', 'max:50', 'email'],
             'address' => ['required'],
             'other_details' => ['nullable']

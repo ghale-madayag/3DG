@@ -17,8 +17,9 @@
 
                         <div class="mb-3">
                             <label class="form-label" for="description">Description</label>
-                           <textarea v-model="form.description" class="form-control" id="description" rows="5">
-                           </textarea>
+                           <!-- <textarea v-model="form.description" class="form-control" id="description" rows="5">
+                           </textarea> -->
+                           <ckeditor :editor="editor" v-model="form.description" :config="editorConfig"></ckeditor>
                         </div>
                         <div class="row">
                             <div class="col-lg-4">
@@ -163,6 +164,24 @@
     import Dropzone from "dropzone";
     import Multiselect from '@vueform/multiselect';
     import '@vueform/multiselect/themes/default.css';
+    import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
+
+    const editor = ClassicEditor;
+    const editorConfig = {
+            toolbar: {
+                items: [
+                    'bold',
+                    'italic',
+                    'numberedList',
+                    'bulletedList',
+                    'indent',
+                    'outdent', 
+                    'link',
+                    'undo',
+                    'redo'
+                ]
+            }
+    }
 
     const regions = ref(null);
     const selectedRegion = ref(null);

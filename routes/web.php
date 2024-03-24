@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\LandDevelopmentController;
+use App\Http\Controllers\UserController;
 use App\Http\Controllers\VelzonRoutesController;
 use App\Models\LandDevelopment;
 use Illuminate\Support\Facades\Route;
@@ -67,12 +68,26 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified',
         Route::delete('/contact/delete','destroy');
     });
 
+    Route::controller(UserController::class)->group(function(){
+        Route::get("/user", "index");
+        Route::post("/user/store","store");
+        // Route::post("/contact/{contact}","update");
+
+        // Route::delete('/contact/delete','destroy');
+    });
+
     Route::controller(LandDevelopmentController::class)->group(function(){
         Route::get('/land', 'index');
         Route::post('/land/create','store');
         Route::get('/land/{land_development:slug}/edit','edit');
+        Route::get('/land/{land_development:slug}', 'show');
         Route::post('/land/{land_development:slug}', 'update');
+
+        Route::post('/land/{land_development:slug}/phase', 'phase');
+        Route::post('/land/{land_development:slug}/lot', 'lot');
 
         Route::delete('/land/delete','destroy');
     });
+
+
 });

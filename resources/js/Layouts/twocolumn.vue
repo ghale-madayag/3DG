@@ -352,7 +352,7 @@ export default {
                         </Link>
                       </li>
                       <li class="nav-item">
-                        <Link href="/property" class="nav-link">
+                        <Link href="/land" class="nav-link">
                           List
                         </Link>
                       </li>
@@ -368,22 +368,22 @@ export default {
                   <div class="collapse menu-dropdown" id="sidebarProperty">
                     <ul class="nav nav-sm flex-column">
                       <li class="nav-item">
-                        <Link href="" class="nav-link">Add
-                        </Link>
-                      </li>
-                      <li class="nav-item">
-                        <Link href="/property" class="nav-link">
-                          List
-                        </Link>
-                      </li>
+                          <Link href="" class="nav-link">Add
+                          </Link>
+                        </li>
+                        <li class="nav-item">
+                          <Link href="/property" class="nav-link">
+                            List
+                          </Link>
+                        </li>
                     </ul>
                   </div>
                 </li>
                 <li class="nav-item">
-                  <Link class="nav-link menu-link" href="/contact" role="button"
+                  <Link class="nav-link menu-link" href="/user" role="button"
                     aria-expanded="false" aria-controls="sidebarDashboards">
-                    <i class="ri-dashboard-2-line"></i>
-                    <span data-key="t-contact"> {{ $t("t-contact") }}</span>
+                    <i class="ri-user-2-fill"></i>
+                    <span data-key="t-user"> {{ $t("t-user") }}</span>
                   </Link>
                 </li>
               </simplebar>

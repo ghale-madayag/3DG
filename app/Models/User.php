@@ -9,6 +9,7 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Fortify\TwoFactorAuthenticatable;
 use Laravel\Jetstream\HasProfilePhoto;
 use Laravel\Sanctum\HasApiTokens;
+use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
@@ -17,6 +18,7 @@ class User extends Authenticatable implements MustVerifyEmail
     use HasProfilePhoto;
     use Notifiable;
     use TwoFactorAuthenticatable;
+    use HasRoles;
 
     /**
      * The attributes that are mass assignable.
@@ -27,6 +29,11 @@ class User extends Authenticatable implements MustVerifyEmail
         'name',
         'email',
         'password',
+        'fname',
+        'lname',
+        'phone',
+        'address',
+        'other_details'
     ];
 
     /**
@@ -58,4 +65,20 @@ class User extends Authenticatable implements MustVerifyEmail
     protected $appends = [
         'profile_photo_url',
     ];
+
+    public function getFormattedPhoneAttribute()
+    {
+        $phoneNumber = $this->attributes['phone'];
+        $formattedPhoneNumber = '(' . substr($phoneNumber, 0, 2) . ')-' . substr($phoneNumber, 2, 3) . '-' . substr($phoneNumber, 5);
+
+        return $formattedPhoneNumber;
+    }
+
+    public function formattedDetails()
+    {
+        return [
+            'value' => $this->id,
+            'label' => $this->fname . ' ' . $this->lname,
+        ];
+    }
 }

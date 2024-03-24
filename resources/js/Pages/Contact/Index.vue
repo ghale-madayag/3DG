@@ -17,7 +17,7 @@
                             </div>
                             <div class="col-sm-auto">
                                 <div class="d-flex flex-wrap align-items-start gap-2">
-                                    <button v-if="selectedRows.length > 0" class="btn btn-soft-danger" @click="deleteSelectedRows"><i class="ri-delete-bin-2-line"></i></button>
+                                    <button v-if="selectedRows?.length > 0" class="btn btn-soft-danger" @click="deleteSelectedRows"><i class="ri-delete-bin-2-line"></i></button>
                                     <button type="button" class="btn btn-success add-btn" @click="openModal"><i class="ri-add-line align-bottom me-1"></i> Add New</button>
                                 </div>
                             </div>
@@ -39,7 +39,7 @@
                         <div class="modal-body">
                             <div class="mb-3">
                                 <label for="fname" class="form-label">First Name</label>
-                                <input v-model="form.fname" id="fname" type="text" class="form-control" :class="{ 'is-invalid': form.errors.fname }" placeholder="Enter First Name" required />
+                                <input v-model="form.name" id="fname" type="text" class="form-control" :class="{ 'is-invalid': form.errors.name }" placeholder="Enter First Name" required />
                                 <div class="invalid-feedback">Please enter first name.</div>
                             </div>
                             <div class="mb-3">
@@ -56,6 +56,7 @@
                             <div class="mb-3">
                                 <label for="phone" class="form-label">Phone</label>
                                 <!-- <input v-model="form.phone" v-mask="'(##)-###-###-####'" :class="{ 'is-invalid': form.errors.phone }" id="phone" type="text" class="form-control" placeholder="(63)-###-###-####" required /> -->
+                                <phone-input :defaultCountry="'PH'"  @phone="phoneVal = $event"/>
                                 <div class="invalid-feedback">{{ form.errors.phone  }}</div>
                             </div>
                             <div class="mb-3">
@@ -85,14 +86,17 @@
     </Layout>
 </template>
 
-<script setup>
+<script setup lang="ts">
     import { Link, Head, useForm } from "@inertiajs/vue3";
     import Layout from "@/Layouts/main.vue";
     import PageHeader from "@/Components/page-header.vue";
     import { ref, onMounted, computed } from 'vue';
-    // import VueInputMask from 'vue-inputmask';
     import { Grid, h } from "gridjs";
     import "gridjs/dist/theme/mermaid.css";
+    import Swal from 'sweetalert2/dist/sweetalert2';
+    import 'sweetalert2/dist/sweetalert2.min.css';
+    
+    const phoneVal = ref();
 
     const gridContainer = ref(null);
     let grid;
@@ -112,13 +116,12 @@
         }
     };
 
-
     let form = useForm({
         id: null,
-        fname:null,
+        name:null,
         lname:null,
         email:null,
-        phone:ref(),
+        phone: null,
         address:null,
         other_details:null
     });
@@ -131,12 +134,21 @@
 
     const showModal = ref(false);
 
+    const swalBtn = Swal.mixin({
+        customClass: {
+            confirmButton: 'btn btn-primary mr-2',
+            cancelButton: 'btn btn-link',
+            container: 'modal-lesson',
+        },
+        buttonsStyling: false
+    })
+
     const editModal = (row) =>{
         editingMode.value = true;
         showModal.value = true;
 
         form.id = row.cells[0].data;
-        form.fname = row.cells[1].data;
+        form.name = row.cells[1].data;
         form.lname = row.cells[2].data;
         form.phone = row.cells[4].data;
         form.email = row.cells[5].data;
@@ -269,6 +281,8 @@
     };
 
     const publish = () =>{
+        form.phone = phoneVal.value;
+
         form.post('/contact/store',{
             onStart: () => {},
             onSuccess: () => {
@@ -313,23 +327,40 @@
     }
 
     const deleteSelectedRows = () => {
-        formDel.id = selectedRows;
-        formDel.delete('/contact/delete',{
-            id: selectedRows.value,
-            onSuccess: () => {
-                const formattedData = formatContactData(props.contacts);
-                
-                grid.updateConfig({
-                    data: function(){
-                        return new Promise(function (resolve){
-                            setTimeout(function(){
-                                resolve(formattedData);
-                            },1000)
-                        })
-                    },
-                }).forceRender();
+        swalBtn.fire({
+            title: 'Are you sure?',
+            text: "Are you Sure You want to Delete this data ?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, delete it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                formDel.id = selectedRows;
+                console.log(formDel.id)
+                formDel.delete('/contact/delete',{
+                    id: selectedRows.value,
+                    onSuccess: () => {
+                        const formattedData = formatContactData(props.contacts);
+                        
+                        grid.updateConfig({
+                            data: function(){
+                                return new Promise(function (resolve){
+                                    setTimeout(function(){
+                                        resolve(formattedData);
+                                    },1000)
+                                })
+                            },
+                        }).forceRender();
+
+                        formDel.reset();
+                        selectedRows.value = [];
+                    }
+                });
             }
-        });
+        })
+       
     }
 
 
@@ -350,8 +381,6 @@
         return date.toLocaleDateString('en-US', options);
     }
 
-   
-
 </script>
 
 <style>
@@ -365,5 +394,9 @@
 
 .gridjs-footer {
     border: 0 !important;
+}
+
+.bg-white.baseinput-core.border.w-full.border-gray.rounded-lg.py-3.px-4.flex.flex-shrink.flex-nowrap.items-center.space-x-2 {
+    padding: 10px !important;
 }
 </style>

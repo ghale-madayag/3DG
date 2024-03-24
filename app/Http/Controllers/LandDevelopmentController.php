@@ -2,13 +2,19 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Block;
 use App\Models\Contact;
 use App\Models\LandDevelopment;
 use App\Models\LandDevelopmentAttachements;
+use App\Models\Lot;
+use App\Models\Phase;
+use App\Rules\UniquePhaseName;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 
 class LandDevelopmentController extends Controller
@@ -85,7 +91,47 @@ class LandDevelopmentController extends Controller
      */
     public function show(LandDevelopment $landDevelopment)
     {
-        //
+        $land = $landDevelopment->load('attachments','seller','owner');
+        $land->seller->phone = $landDevelopment->seller->formatted_phone;
+
+        $blocks = Block::with('phase')->whereHas('phase', function ($query) use ($landDevelopment) {
+            $query->where('land_development_id', $landDevelopment->id);
+        })->filter(request(['phase']))
+        ->get();
+
+        $phasesLot = Block::with('phase','lot')->whereHas('phase', function ($query) use ($landDevelopment) {
+            $query->where('land_development_id', $landDevelopment->id);
+        })->filter(request(['phase','block']))
+        ->get();
+
+        $phasesFilterVal = Phase::where('land_development_id', $landDevelopment->id)->get();
+        
+        $formattedData = $phasesLot->flatMap(function ($block) {
+            return $block->lot->map(function ($lot) use ($block) {
+                return (object) [
+                    'id' => $lot->id,
+                    'name' => "Lot $lot->lot_number",
+                    'size' => $lot->size,
+                    'status' => 'Available',
+                    'created_at' => $lot->created_at,
+                    'details' => $lot->details,
+                    'blk_name' => "Block $block->block_number",
+                    'phase_name' => $block->phase->phase_name
+                ];
+            });
+        });
+
+        $phaseFilter = $this->formattedDetails($phasesFilterVal, 'id', 'phase_name', '');
+        $blockFilter = $this->formattedDetails($blocks, 'id', 'block_number', 'Block ');
+
+        return Inertia::render('Land/Develop',[
+            'land' => $land,
+            'phaseVal' => $phasesFilterVal,
+            'blockVal' => $blocks,
+            'phaseFilter' => $phaseFilter,
+            'blockFilter' => $blockFilter,
+            'phaseDetails' => $formattedData
+        ]);
     }
 
     /**
@@ -123,6 +169,71 @@ class LandDevelopmentController extends Controller
 
     }
 
+    public function phase(Request $request, LandDevelopment $landDevelopment){
+        try {
+            $validatedData = $request->validate([
+                'phase' => 'array|required',
+                'block' => 'array|required',
+            ]);
+    
+            foreach ($validatedData['phase'] as $index => $phaseName) {
+                // Validate phase_name uniqueness within the specified land_development_id
+                $request->validate([
+                    "phase.{$index}" => ['required', 'string', new UniquePhaseName($landDevelopment->id)],
+                ]);
+
+                // Find the last block number for this phase
+                $lastBlockNumber = Block::whereHas('phase', function ($query) use ($phaseName, $landDevelopment) {
+                    $query->where('land_development_id', $landDevelopment->id);
+                })->max(DB::raw('CAST(block_number AS UNSIGNED)')) ?? 0;
+    
+                $phase = Phase::create([
+                    'phase_name' => $phaseName,
+                    'land_development_id' => $landDevelopment->id
+                ]);
+    
+                for ($i = 0; $i < $validatedData['block'][$index]; $i++) {
+                    Block::create([
+                        'block_number' => ++$lastBlockNumber,
+                        'phase_id' => $phase->id,
+                    ]);
+                }
+            }
+    
+        } catch (ValidationException $e) {
+            dd($e);
+            // Handle validation errors
+            return Redirect::back()->withErrors(['error' => 'Somes phase has already exist for the specified land.']);
+            //return Redirect::to('/land/'.$landDevelopment->slug)->with('message', ['error' => $e->errors()])->withStatus(422);
+
+        }
+    
+        // Successfully processed the data
+        return redirect()->back();
+        
+    }
+
+    public function lot(Request $request, LandDevelopment $landDevelopment){
+
+        $validatedData = $request->validate([
+            'phase' => 'required',
+            'block' => 'required',
+            'lot' => 'required',
+        ]);
+
+        $lastLotNumber = Lot::where('block_id', $request->block)
+        ->max('lot_number') ?? 0;
+
+        for ($i = 0; $i < $validatedData['lot']; $i++) {
+          
+            Lot::create([
+                'block_id' => $request->block,
+                'lot_number' => ++$lastLotNumber,
+            ]);
+           
+        }
+    }
+
     /**
      * Remove the specified resource from storage.
      */
@@ -158,8 +269,7 @@ class LandDevelopmentController extends Controller
         return $rules;
     }
 
-    function generateContactDetails(Collection $contacts): array
-{
+    function generateContactDetails(Collection $contacts): array{
         $contactDetails = $contacts->map(function ($contact) {
             return [
                 'value' => $contact->id,
@@ -177,4 +287,21 @@ class LandDevelopmentController extends Controller
 
         return $contactDetails;
     }
+
+    public function formattedDetails(Collection $objects, $idKey, $labelKey, $labelPrefix): array
+{
+    $formattedObjects = [];
+
+    foreach ($objects as $object) {
+        $formattedObjects[] = [
+            'value' => $object->$idKey, // Accessing dynamic id key
+            'label' => $labelPrefix . $object->$labelKey, // Accessing dynamic label key
+        ];
+    }
+
+    return $formattedObjects;
 }
+
+}
+
+   

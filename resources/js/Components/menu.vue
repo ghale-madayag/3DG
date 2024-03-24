@@ -192,7 +192,7 @@ export default {
             </ul>
           </div>
         </li>
-        <li class="nav-item">
+        <!-- <li class="nav-item">
           <a class="nav-link menu-link" href="#sidebarProperty" data-bs-toggle="collapse" role="button" aria-expanded="false"
             aria-controls="sidebarProperty">
             <i class="ri-home-heart-line"></i>
@@ -211,26 +211,13 @@ export default {
               </li>
             </ul>
           </div>
-        </li>
+        </li> -->
+        
         <li class="nav-item">
-          <Link class="nav-link menu-link" href="#" role="button"
-            aria-expanded="false">
-            <i class="ri-user-follow-line"></i>
-            <span data-key="t-client"> {{ $t("t-client") }}</span>
-          </Link>
-        </li>
-        <li class="nav-item">
-          <Link class="nav-link menu-link" href="#" role="button"
-            aria-expanded="false">
-            <i class="ri-user-2-fill"></i>
-            <span data-key="t-agent"> {{ $t("t-agent") }}</span>
-          </Link>
-        </li>
-        <li class="nav-item">
-          <Link class="nav-link menu-link" href="/contact" role="button"
+          <Link class="nav-link menu-link" href="/user" role="button"
             aria-expanded="false" aria-controls="sidebarDashboards">
-            <i class="ri-dashboard-2-line"></i>
-            <span data-key="t-contact"> {{ $t("t-contact") }}</span>
+            <i class="ri-user-2-fill"></i>
+            <span data-key="t-user"> {{ $t("t-user") }}</span>
           </Link>
         </li>
         
@@ -530,3 +517,9 @@ export default {
     </ul>
   </template>
 </BContainer></template>
+
+<script setup>
+  let props = defineProps({
+    roles: Object,
+  })
+</script>

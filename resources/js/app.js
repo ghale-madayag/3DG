@@ -13,7 +13,8 @@ import VueApexCharts from "vue3-apexcharts";
 import VueFeather from 'vue-feather';
 import VueTheMask from 'vue-the-mask';
 import CKEditor from '@ckeditor/ckeditor5-vue';
-import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
+import { PhoneInput } from '@lbgm/phone-number-input';
+import '@lbgm/phone-number-input/style';
 
 import AOS from 'aos';
 import 'aos/dist/aos.css';
@@ -41,6 +42,7 @@ createInertiaApp({
             .use(vClickOutside)
             .use(CKEditor)
             .component(VueFeather.type, VueFeather)
+            .component('PhoneInput', PhoneInput)
             .mount(el);
     },
     progress: {
