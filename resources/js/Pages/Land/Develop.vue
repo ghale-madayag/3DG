@@ -501,6 +501,43 @@
                                     </div>
                                 </div>
                             </div>
+
+                            <div class="modal fade" v-if="showModalLotDetails" :class="{ 'show': showModalLotDetails }" tabindex="-1" role="dialog">
+                                <div class="modal-dialog modal-dialog-centered">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title">Lot Details</h5>
+                                            <button type="button" class="btn-close" @click="closeModalLotDetails" aria-label="Close"></button>
+                                        </div>
+                                        <form class="tablelist-form" autocomplete="off"  @submit.prevent="submitHandler">
+                                            <div class="modal-body">
+                                                <div>
+                                                    <div class="row gy-4">
+                                                        <div>
+                                                            <label for="size" class="form-label">Lot Size (sqm)</label>
+                                                            <input type="number" class="form-control" :class="{'is-invalid': formLotDetails.errors.size }" v-model="formLotDetails.size" id="size">
+                                                            <div class="invalid-feedback">{{ formLotDetails.errors.size }}</div>
+                                                        </div>
+                                                        <div>
+                                                            <label for="details" class="form-label">Details</label>
+                                                            <textarea class="form-control" id="details" rows="3" v-model="formLotDetails.details"></textarea>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <div class="hstack gap-2 justify-content-end">
+                                                    <button type="button" class="btn btn-light" @click="closeModalLot">Close</button>
+                                                    <div v-if="form.processing" class="spinner-border text-success" role="status">
+                                                        <span class="sr-only">Loading...</span>
+                                                    </div>
+                                                    <button type="submit" @click="submitFormLotDetails" class="btn btn-success is-loading">Update</button>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
                             <!--end Modal-->
                         </div>
                     </div>
@@ -525,6 +562,7 @@
 
     const showModal = ref(false);
     const showModalLot = ref(false);
+    const showModalLotDetails = ref(false);
 
     let props = defineProps({
         land: Object,
@@ -565,6 +603,12 @@
         phase:null,
         block:null,
         lot:initialBlockValue,
+    })
+
+    let formLotDetails = useForm({
+        id:null,
+        size:null,
+        details: null,
     })
 
     // Function to increment the block value
@@ -673,6 +717,15 @@
         showModalLot.value = false;
     }
 
+    const openModalLotDetails = () => {
+        showModalLotDetails.value = true;
+    }
+
+    const closeModalLotDetails = () => {
+        showModalLotDetails.value = false;
+    }
+
+
     const swalBtn = Swal.mixin({
         customClass: {
             confirmButton: 'btn btn-primary mr-2',
@@ -721,6 +774,15 @@
                 )
 
                 fetchDataAndUpdateGrid(props.phaseDetails)
+            }
+        })
+    }
+
+    const submitFormLotDetails = () => {
+        formLotDetails.post('/land/lot/'+formLotDetails.id+'/update',{
+            onSuccess: () =>{
+                showModalLotDetails.value = false;
+                formLotDetails.reset();
                 fetchDataAndUpdateGrid(props.phaseDetails)
             }
         })
@@ -875,7 +937,7 @@
                 ]);
             }
         },
-                {id:'sizeColumn',name: 'Size'},
+                {id:'sizeColumn',name: 'Size (Sqm)'},
                 {id: 'detailsColumn',name: 'Details'},
                 {
                     id: 'statusColumn',
@@ -899,7 +961,7 @@
                     align: 'center',
                     width: '75px',
                     formatter: (cell, row) => {
-                        return  h('a', { href: 'javascript:void(0);', className: 'text-muted',  onClick: () => editModal(row) },[
+                        return  h('a', { href: 'javascript:void(0);', className: 'text-muted',  onClick: () => editModalLotDetails(row) },[
                             h('i', { className: 'ri-pencil-fill fs-16' }),
                         ])
                     },
@@ -1048,6 +1110,14 @@
         }).render(gridContainerPhase.value);
     });
 
+    const editModalLotDetails = (row) =>{
+        formLotDetails.id = row.cells[0].data;
+        formLotDetails.size = row.cells[2].data;
+        formLotDetails.details = row.cells[3].data;
+
+        console.log(row);
+        showModalLotDetails.value = true;
+    }
 </script>
 
 <style>

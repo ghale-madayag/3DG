@@ -16,4 +16,5 @@ class Lot extends Model
     {
         return $this->belongsTo(Block::class);
     }
+
 }

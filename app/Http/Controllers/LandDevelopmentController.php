@@ -176,6 +176,17 @@ class LandDevelopmentController extends Controller
 
     }
 
+    public function updateLot(Request $request, Lot $lot){
+        $validateLot = $request->validate([
+            'size' => 'required|numeric',
+            'details' => 'nullable',
+        ]);
+
+        $lot->update($validateLot);
+
+        return redirect()->back();
+    }
+
     public function phase(Request $request, LandDevelopment $landDevelopment){
         try {
             $validatedData = $request->validate([

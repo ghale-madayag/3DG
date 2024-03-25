@@ -86,6 +86,8 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified',
         Route::post('/land/{land_development:slug}/phase', 'phase');
         Route::post('/land/{land_development:slug}/lot', 'lot');
 
+        Route::post('/land/lot/{lot:id}/update','updateLot');
+
         Route::delete('/land/delete','destroy');
     });
 
