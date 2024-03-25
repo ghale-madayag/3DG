@@ -23,16 +23,12 @@ class UserController extends Controller
 
     public function index()
     {
-        // Retrieve contacts with formatted phone numbers
-        // $contacts = Contact::orderBy('created_at', 'desc')->get()->map(function ($contact) {
-        //     $contact->phone = $contact->formatted_phone;
-        //     return $contact;
-        // });
 
         $currentUser = Auth::user();
 
         $user = User::where('id', '!=', $currentUser->id)
             ->where('id', '!=', '1')
+            ->where('id', '!=', $currentUser->id)
             ->orderBy('created_at', 'desc')->get()->map(function ($user) {
             $user->phone = $user->formatted_phone;
             $roles = $user->getRoleNames()->toArray();
@@ -53,23 +49,16 @@ class UserController extends Controller
         $user = $this->creator->create(array_merge($validatedData,['password'=> $password]));
         $user['password'] = $password;
 
+        $this->sendEmailVerification($user, $request->roles);
 
-        if($request->roles=='administrator'){
-            $user->assignRole('administrator');
-            Mail::to($user)->send(new WelcomeEmail($user));
-        }elseif($request->roles=='staff'){
-            $user->assignRole('staff');
-            Mail::to($user)->send(new WelcomeEmail($user));
-        }elseif($request->roles=='agent'){
-            $user->assignRole('agent');
-            Mail::to($user)->send(new WelcomeEmail($user));
-        }elseif($request->roles=='client'){
-            $user->assignRole('client');
-            Mail::to($user)->send(new WelcomeEmail($user));
-        }else{
-            $user->assignRole('contact');
-        }
+    }
 
+    public function update(Request $request, User $user)
+    {
+        $validatedData = $request->validate($this->getValidationRules($user));   
+        
+        $user->update($validatedData);
+        
     }
 
     private function getValidationRules($contact = null)
@@ -95,5 +84,25 @@ class UserController extends Controller
         }
     
         return $rules;
+    }
+
+    private function sendEmailVerification($user, $roles)
+    {
+
+        if($roles=='administrator'){
+            $user->assignRole('administrator');
+            Mail::to($user)->send(new WelcomeEmail($user));
+        }elseif($roles=='staff'){
+            $user->assignRole('staff');
+            Mail::to($user)->send(new WelcomeEmail($user));
+        }elseif($roles=='agent'){
+            $user->assignRole('agent');
+            Mail::to($user)->send(new WelcomeEmail($user));
+        }elseif($roles=='client'){
+            $user->assignRole('client');
+            Mail::to($user)->send(new WelcomeEmail($user));
+        }else{
+            $user->assignRole('contact');
+        }
     }
 }

@@ -49,14 +49,14 @@
                             </div>
                             <div class="mb-3">
                                 <label for="email" class="form-label">Email</label>
-                                <input v-model="form.email" id="email" type="email" class="form-control" :class="{ 'is-invalid': form.errors.email }" placeholder="Enter email" />
+                                <input v-model="form.email" id="email" type="email" class="form-control" :class="{ 'is-invalid': form.errors.email }" :disabled="phoneUpdate" placeholder="Enter email" />
                                 <div class="invalid-feedback">{{ form.errors.email  }}</div>
                             </div>
 
                             <div class="mb-3">
                                 <label for="phone" class="form-label">Phone</label>
                                 <!-- <input v-model="form.phone" v-mask="'(##)-###-###-####'" :class="{ 'is-invalid': form.errors.phone }" id="phone" type="text" class="form-control" placeholder="(63)-###-###-####" required /> -->
-                                <phone-input :defaultCountry="'PH'"  @phone="phoneVal = $event"/>
+                                <phone-input :defaultCountry="'PH'"  @phone="phoneVal = $event" :value="phoneUpdate" :class="{ 'is-invalid': form.errors.phone }"/>
                                 <div class="invalid-feedback">{{ form.errors.phone  }}</div>
                             </div>
                             <div class="mb-3">
@@ -108,6 +108,7 @@
     import 'sweetalert2/dist/sweetalert2.min.css';
     
     const phoneVal = ref();
+    const phoneUpdate = ref();
 
     const gridContainer = ref(null);
     let grid;
@@ -170,10 +171,14 @@
         form.address = row.cells[6].data;
         form.other_details = row.cells[7].data;
         form.roles = row.cells[9].data;
+
+        phoneUpdate.value = form.phone;
     }
 
     const closeModal = () => {
         showModal.value = false;
+        form.reset();
+        phoneUpdate.value = null;
     };
     
     const formatContactData = contacts => {
@@ -325,7 +330,10 @@
     }
 
     const edit = () =>{
-        form.post('/contact/'+form.id,{
+        form.phone = phoneVal.value;
+        form.name = form.fname+' '+form.lname;
+
+        form.post('/user/'+form.id,{
             onStart: () => {},
             onSuccess: () => {
                 const formattedData = formatContactData(props.contacts);

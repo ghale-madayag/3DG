@@ -71,7 +71,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified',
     Route::controller(UserController::class)->group(function(){
         Route::get("/user", "index");
         Route::post("/user/store","store");
-        // Route::post("/contact/{contact}","update");
+        Route::post("/user/{user}","update");
 
         // Route::delete('/contact/delete','destroy');
     });

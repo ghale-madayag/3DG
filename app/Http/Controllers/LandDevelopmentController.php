@@ -8,9 +8,11 @@ use App\Models\LandDevelopment;
 use App\Models\LandDevelopmentAttachements;
 use App\Models\Lot;
 use App\Models\Phase;
+use App\Models\User;
 use App\Rules\UniquePhaseName;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Storage;
@@ -39,11 +41,16 @@ class LandDevelopmentController extends Controller
      */
     public function create()
     {
-        $contacts = Contact::orderBy('fname', 'asc')->get();
-        $contactDetails = $this->generateContactDetails($contacts);
+
+        $currentUser = Auth::user();
+
+        $user = User::orderBy('fname', 'asc')
+            ->where('id', '!=', $currentUser->id)
+            ->get();
+        $userDetails = $this->generateContactDetails($user);
 
         return Inertia::render('Land/Create',[
-            'contacts' => $contactDetails,
+            'contacts' => $userDetails,
         ]);
     }
 
