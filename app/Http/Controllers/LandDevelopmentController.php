@@ -227,10 +227,10 @@ class LandDevelopmentController extends Controller
             'ground_breaking' => ['nullable'],
             'seller_id' => ['nullable'],
             'owner_id' => ['nullable'],
-            'region' => ['nullable'],
-            'province' => ['nullable'],
-            'municipality' => ['nullable'],
-            'barangay' => ['nullable'],
+            'region' => ['required'],
+            'province' => ['required'],
+            'municipality' => ['required'],
+            'barangay' => ['required'],
             'address' => ['nullable'],
             
         ];

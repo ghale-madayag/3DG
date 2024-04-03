@@ -64,49 +64,53 @@
                         <h5 class="card-title mb-0">Location Details</h5>
                     </div>
                     <div class="card-body">
-                        <div class="form-group">
+                        <div class="form-group mb-3">
                             <label class="form-label">Region</label>
                             <Multiselect
-                            class="form-select mb-3"
                             v-model="selectedRegion"
                             placeholder="Select Region"
                             :options="regions"
                             :searchable="true"
                             track-by="label"
+                            :class="{ 'is-invalid': form.errors.region }"
                             />
+                            <div class="invalid-feedback">{{ form.errors.region }}</div>
                         </div>
-                        <div class="form-group">
+                        <div class="form-group mb-3">
                             <label class="form-label">Province</label>
                             <Multiselect
-                            class="form-select mb-3"
                             v-model="selectedProvince"
                             placeholder="Select Province"
                             :searchable="true"
                             track-by="label"
                             :options="selectedRegion ? selectedProvinceList : []"
+                            :class="{ 'is-invalid': form.errors.province }"
                             />
+                            <div class="invalid-feedback">{{ form.errors.province }}</div>
                         </div>
-                        <div class="form-group">
+                        <div class="form-group mb-3">
                             <label class="form-label">Municipality</label>
                             <Multiselect
-                            class="form-select mb-3"
                             v-model="selectedMunicipality"
                             placeholder="Select Municipality"
                             :searchable="true"
                             track-by="label"
                             :options="selectedProvince ? selectedMunList : []"
+                            :class="{ 'is-invalid': form.errors.municipality }"
                             />
+                            <div class="invalid-feedback">{{ form.errors.municipality }}</div>
                         </div>
-                        <div class="form-group">
+                        <div class="form-group mb-3">
                             <label class="form-label">Barangay</label>
                             <Multiselect
-                            class="form-select mb-3"
                             v-model="selectedBarangay"
                             placeholder="Select Barangay"
                             :searchable="true"
                             track-by="label"
                             :options="selectedMunicipality ? selectedBarList : []"
+                            :class="{ 'is-invalid': form.errors.barangay }"
                             />
+                            <div class="invalid-feedback">{{ form.errors.barangay }}</div>
                         </div>
                         <div class="mb-3">
                             <label for="address" class="form-label">Blk/Lot/Street/House No.</label>
