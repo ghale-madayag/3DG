@@ -136,7 +136,7 @@ class ProjectController extends Controller
             
 
         }catch (ValidationException $e) {
-            return Redirect::back()->withErrors(['error' => 'Invalid Phase!']);
+             return Redirect::back()->withErrors(['error' => $e->getMessage()]);
         }
 
         return Redirect::to('/project/'.$project->slug.'/edit')->with('message', 'Project has been created successfully.');
@@ -520,7 +520,8 @@ class ProjectController extends Controller
 
         $properties = Project::with(['images', 'phase.block.lot' => function ($query) {
             $query->where('status', 'Available'); // Filter lots by status
-        }])->get(); 
+        }])->filter(request(['project']))
+        ->get(); 
         
         $properties->each(function ($property) {
             $totalLots = 0; 

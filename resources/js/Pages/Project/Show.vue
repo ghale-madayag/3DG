@@ -1140,13 +1140,13 @@
         }
         
         router.get('/project/' + props.project.slug, params, {
-                preserveState: true,
-                preserveScroll: true,
-                replace: true,
-                onSuccess: () =>{
-                    fetchDataAndUpdateGrid('lot',formatProjectData(props.phaseDetails));
-                }
-            });
+            preserveState: true,
+            preserveScroll: true,
+            replace: true,
+            onSuccess: () =>{
+                fetchDataAndUpdateGrid('lot',formatProjectData(props.phaseDetails));
+            }
+        });
     }, 500));
 
     watch([selectedPhaseLot, selectedBlockLot], debounce(function ([phaseValue, blockValue]) {

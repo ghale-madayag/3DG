@@ -9,14 +9,30 @@
                 <div class="row g-2">
                     <div class="col-xl-3">
                         <div class="search-box">
-                            <input type="text" class="form-control search" placeholder="Search..."> <i class="ri-search-line search-icon"></i>
+                            <input type="text" v-model="searchProject" class="form-control search" placeholder="Search..."> <i class="ri-search-line search-icon"></i>
                         </div>
                     </div>
                     <div class="col-xl-2">
                         <div class="hstack gap-2">
-                            <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addSeller"><i class="ri-add-fill me-1 align-bottom"></i> Add Project</button>
+                            <Link class="btn btn-success" href="/project/create"><i class="ri-add-fill me-1 align-bottom"></i> Add Project</Link>
                         </div>
                     </div>
+                </div>
+            </div>
+        </div>
+        <div class="row" v-if="!debounceRunning" >
+            <div class="col-lg-12">
+                <div class="text-center mb-3">
+                    <button type="button" class="btn btn-link text-success btn-lg">
+                        <span class="d-flex align-items-center">
+                            <span class="flex-grow-1 me-2">
+                                Loading...
+                            </span>
+                            <span class="spinner-grow flex-shrink-0" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </span>
+                        </span>
+                    </button>
                 </div>
             </div>
         </div>
@@ -36,7 +52,10 @@
                                         :modules="modules"
                                         class="navigation-swiper rounded"
                                     >
-                                        <swiper-slide  class="swiper-slide" v-for="(slide, index) in property.images" :key="index">
+                                        <swiper-slide v-if="!property.images || !property.images.length" class="swiper-slide">
+                                            <img src='/storage/assets/placeholder.png' class="img-fluid d-block swiper-slide-image"/>
+                                        </swiper-slide>
+                                        <swiper-slide v-else class="swiper-slide" v-for="(slide, index) in property.images" :key="index">
                                             <img @click="openImage(slide.file_name)" :src="'/storage/project/images/'+slide.file_name" class="img-fluid d-block swiper-slide-image"/>
                                         </swiper-slide>
                                     </swiper>
@@ -45,12 +64,12 @@
                         </div>
                     </div>
                     <div class="card-body">
-                        <p class="fw-medium mb-0 float-end"><i class="ri-checkbox-circle-fill text-primary"></i> {{ property.totalLots }} </p>
+                        <p class="fw-medium mb-0 float-end"><i :class="{'ri-checkbox-circle-fill': property.totalLots > 0, 'ri-close-circle-fill': property.totalLots == 0, 'text-primary': property.totalLots > 0, 'text-danger': property.totalLots == 0}"></i> {{ property.totalLots }} </p>
                         <h5 class="mb-1 fs-16"><Link :href="'/property/'+property.slug" class="text-body">{{ property.name }}</Link></h5>
                         <p class="text-muted mb-0"><i class="ri-community-fill"></i> Total Units: {{ property.total_units }}</p>
                     </div>
                     <div class="card-footer border-top border-top-dashed">
-                        <Link :href="'/property/'+property.slug" class="card-link link-primary mt-3">Read More <i class="ri-arrow-right-s-line ms-1 align-middle lh-1"></i></Link>
+                        <Link :href="'/property/'+property.slug" class="card-link link-primary mt-3">View Property <i class="ri-arrow-right-s-line ms-1 align-middle lh-1"></i></Link>
                     </div>
                 </div>
             </div>
@@ -66,25 +85,29 @@
                     </div>
                 </div><!-- /.modal-content -->
             </div><!-- /.modal-dialog -->
-        </div><!-- /.modal -->
+        </div>
     </Layout>
 </template>
 <script setup>
-    import { ref, onMounted } from 'vue';
-    import { Link, Head } from "@inertiajs/vue3";
+    import { ref, onMounted, watch } from 'vue';
+    import { Link, Head, router } from "@inertiajs/vue3";
     import Layout from "@/Layouts/main.vue";
     import PageHeader from "@/Components/page-header.vue";
     import { Swiper, SwiperSlide } from "swiper/vue";
     import { FreeMode,Autoplay, Pagination, Navigation, Thumbs  } from 'swiper/modules';
     import "swiper/swiper-bundle.css";
+    import  debounce from "lodash/debounce";
 
     let props = defineProps({
         properties: Object,
     })
 
+    const searchProject = ref(null);
+
     const modules = [FreeMode, Thumbs, Autoplay, Pagination, Navigation];
 
     const modalImage = ref(null);
+    let debounceRunning = false;
 
     const closeModal = () => {
         modalImage.value = null;
@@ -94,12 +117,30 @@
         modalImage.value = image;
     };
 
+    watch([searchProject], debounce(function ([project]) {
+        
+        debounceRunning = true;
+        const params = {};
+        params.project = project;
+
+        router.get('/property/', params, {
+            preserveState: true,
+            preserveScroll: true,
+            replace: true,
+            onSuccess: () =>{
+                debounceRunning = false;
+            }
+        });
+
+    }, 500));
+
 </script>
 
 <style>
     .swiper-slide-image {
     max-height: 300px; /* Adjust the value as needed */
     width: auto; /* Ensure image width adjusts proportionally */
+    min-height: 205px;
     }
 
     .swiper-slide-thumbs{

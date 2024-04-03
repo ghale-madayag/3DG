@@ -10,6 +10,7 @@
                     <div class="card-body">
                         <div class="mb-3">
                             <label class="form-label" for="name">Project Name</label>
+                            <AlertMsg v-if="form.errors.error" :type="'danger'" :msg="form.errors.error"/>
                             <input v-model="form.name" :class="{ 'is-invalid': form.errors.name }" type="text" class="form-control">
                             <div class="invalid-feedback">The project name is required</div>
                         </div>
@@ -85,7 +86,6 @@
                         <h5 class="card-title mb-0">Phase and Blocks</h5>
                     </div>
                     <div class="card-body">
-                        <AlertMsg v-if="form.errors.error" :type="'danger'" :msg="form.errors.error"/>
                         <div v-for="(phase, index) in phases" :key="index" class="row gy-4">
                             <div class="col-lg-6">
                                 <div>

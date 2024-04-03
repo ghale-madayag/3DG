@@ -21,6 +21,15 @@ class Project extends Model
         'end_date',
     ];
 
+    public function scopeFilter($query, array $filters)
+    {
+        if (isset($filters['project'])) {
+            $query->where('name', 'like', '%' . $filters['project'] . '%');
+        }
+
+        return $query;
+    }
+
     protected static function boot()
     {
         parent::boot();
