@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('lot_images', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('lot_id');
-            $table->foreign('lot_id')->references('id')->on('lot')->onDelete('cascade');
+            $table->foreign('lot_id')->references('id')->on('lots')->onDelete('cascade');
             $table->string('file_name');
             $table->unsignedBigInteger('size')->nullable();
             $table->timestamps();
