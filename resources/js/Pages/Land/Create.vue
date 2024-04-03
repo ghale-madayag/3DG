@@ -201,7 +201,7 @@
 
     let form = useForm({
         name: null,
-        description: null,
+        description: '',
         size: null,
         ground_breaking: null,
         attachments: [],

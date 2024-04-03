@@ -14,9 +14,12 @@ return new class extends Migration
         Schema::create('lots', function (Blueprint $table) {
             $table->id();
             $table->string('lot_number', 10);
+            $table->string('lot_name')->nullable();
             $table->foreignId('block_id')->constrained('blocks');
             $table->string('size')->nullable();
-            $table->string('details')->nullable();
+            $table->string('category')->nullable();
+            $table->string('status');
+            $table->text('description')->nullable();
             $table->timestamps();
         });
     }

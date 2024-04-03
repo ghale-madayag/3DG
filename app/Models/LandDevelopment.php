@@ -49,11 +49,11 @@ class LandDevelopment extends Model
 
     public function seller()
     {
-        return $this->belongsTo(Contact::class, 'seller_id');
+        return $this->belongsTo(User::class, 'seller_id');
     }
 
     public function owner()
     {
-        return $this->belongsTo(Contact::class, 'owner_id');
+        return $this->belongsTo(User::class, 'owner_id');
     }
 }

@@ -15,16 +15,29 @@ class UsersSeeder extends Seeder
      */
     public function run(): void
     {
-        $user =  User::create([
-            'name' => 'Abegail',
-            'email' => 'ghale.madayag@gmail.com',
-            'password' => Hash::make('u2tH9eRsg$!!wc2'),
-            'fname' => 'Abegail',
-            'lname' => 'Madayag',
-            'phone' => '639190982923',
-        ]);
+        $users = [
+            ['name' => 'Abegail', 
+                'email' => 'ghale.madayag@gmail.com', 
+                'password' => Hash::make('u2tH9eRsg$!!wc2'), 
+                'fname' => 'Abegail', 
+                'lname' => 'Madayag', 
+                'phone' => '639190982923'
+            ],
+            ['name' => 'NJ Carreon', 
+                'email' => 'Drrealtydevelopment@gmail.com', 
+                'password' => '$2y$10$zmscX2aR6RQUvauO27ZD.u0u.VXwZ840lSZWMZ7UOB6SQK1uzSbsO', 
+                'fname' => 'NJ', 
+                'lname' => 'Carreon', 
+                'phone' => '639812751740'
+            ],
+        ];
+
+        foreach ($users as $user) {
+            $us = User::create($user);
+            $us->assignRole('administrator');
+        }
         
-        $user->assignRole('administrator');
+        
 
     }
 }

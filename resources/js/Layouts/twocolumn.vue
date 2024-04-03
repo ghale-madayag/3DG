@@ -360,25 +360,25 @@ export default {
                   </div>
                 </li>
                 <li class="nav-item">
-                  <a class="nav-link menu-link" href="#sidebarProperty" data-bs-toggle="collapse" role="button" aria-expanded="false"
-                    aria-controls="sidebarProperty">
-                    <i class="ri-home-heart-line"></i>
-                    <span data-key="t-property">{{ $t("t-property") }}</span>
-                  </a>
-                  <div class="collapse menu-dropdown" id="sidebarProperty">
-                    <ul class="nav nav-sm flex-column">
-                      <li class="nav-item">
-                          <Link href="" class="nav-link">Add
-                          </Link>
-                        </li>
-                        <li class="nav-item">
-                          <Link href="/property" class="nav-link">
-                            List
-                          </Link>
-                        </li>
-                    </ul>
-                  </div>
-                </li>
+          <a class="nav-link menu-link" href="#sidebarProject" data-bs-toggle="collapse" role="button" aria-expanded="false"
+            aria-controls="sidebarProject">
+            <i class="ri-home-heart-line"></i>
+            <span data-key="t-property">{{ $t("t-project") }}</span>
+          </a>
+          <div class="collapse menu-dropdown" id="sidebarProject">
+            <ul class="nav nav-sm flex-column">
+              <li class="nav-item">
+                <Link href="/project/create" class="nav-link">Add
+                </Link>
+              </li>
+              <li class="nav-item">
+                <Link href="/project" class="nav-link">
+                  List
+                </Link>
+              </li>
+            </ul>
+          </div>
+        </li>
                 <li class="nav-item">
                   <Link class="nav-link menu-link" href="/user" role="button"
                     aria-expanded="false" aria-controls="sidebarDashboards">

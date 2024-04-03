@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Contact;
 use App\Models\LandDevelopment;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
 class VelzonRoutesController extends Controller
@@ -13,12 +15,14 @@ class VelzonRoutesController extends Controller
 
     public function dashboard()
     {
+
+        $currentUser = Auth::user();
         $land = LandDevelopment::count();
-        $contact = Contact::count();
+        $user = User::where('id', '!=', $currentUser->id)->count();
 
         return Inertia::render('dashboards/Index',[
             'land' => $land,
-            'contact' => $contact,
+            'user' => $user,
         ]);
     }
 

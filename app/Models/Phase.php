@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Phase extends Model
 {
     use HasFactory;
-    protected $fillable = ['phase_name', 'land_development_id'];
+    protected $fillable = ['phase_name', 'project_id'];
 
     public function block()
     {

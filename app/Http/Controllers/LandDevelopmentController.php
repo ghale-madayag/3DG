@@ -31,6 +31,8 @@ class LandDevelopmentController extends Controller
             ->orderby('created_at','desc')
             ->get();
 
+       // dd($land);
+
         return Inertia::render('Land/Index',[
             'lands' => $land,
         ]);
@@ -99,45 +101,13 @@ class LandDevelopmentController extends Controller
     public function show(LandDevelopment $landDevelopment)
     {
         $land = $landDevelopment->load('attachments','seller','owner');
-        $land->seller->phone = $landDevelopment->seller->formatted_phone;
 
-        $blocks = Block::with('phase')->whereHas('phase', function ($query) use ($landDevelopment) {
-            $query->where('land_development_id', $landDevelopment->id);
-        })->filter(request(['phase']))
-        ->get();
-
-        $phasesLot = Block::with('phase','lot')->whereHas('phase', function ($query) use ($landDevelopment) {
-            $query->where('land_development_id', $landDevelopment->id);
-        })->filter(request(['phase','block']))
-        ->get();
-
-        $phasesFilterVal = Phase::where('land_development_id', $landDevelopment->id)->get();
-        
-        $formattedData = $phasesLot->flatMap(function ($block) {
-            return $block->lot->map(function ($lot) use ($block) {
-                return (object) [
-                    'id' => $lot->id,
-                    'name' => "Lot $lot->lot_number",
-                    'size' => $lot->size,
-                    'status' => 'Available',
-                    'created_at' => $lot->created_at,
-                    'details' => $lot->details,
-                    'blk_name' => "Block $block->block_number",
-                    'phase_name' => $block->phase->phase_name
-                ];
-            });
-        });
-
-        $phaseFilter = $this->formattedDetails($phasesFilterVal, 'id', 'phase_name', '');
-        $blockFilter = $this->formattedDetails($blocks, 'id', 'block_number', 'Block ');
+        if ($landDevelopment->seller) {
+            $land->seller_id = $landDevelopment->seller->id;
+        }
 
         return Inertia::render('Land/Develop',[
             'land' => $land,
-            'phaseVal' => $phasesFilterVal,
-            'blockVal' => $blocks,
-            'phaseFilter' => $phaseFilter,
-            'blockFilter' => $blockFilter,
-            'phaseDetails' => $formattedData
         ]);
     }
 
@@ -147,8 +117,8 @@ class LandDevelopmentController extends Controller
     public function edit(LandDevelopment $landDevelopment)
     {
 
-        $contacts = Contact::orderBy('fname', 'asc')->get();
-        $contactDetails = $this->generateContactDetails($contacts);
+        $user = User::orderBy('fname', 'asc')->get();
+        $userDetails = $this->generateContactDetails($user);
 
         $landDevelopment->load('attachments', 'seller', 'owner');
 
@@ -158,7 +128,7 @@ class LandDevelopmentController extends Controller
 
         return Inertia::render('Land/Edit',[
             'land' => $landDevelopment,
-            'contacts' => $contactDetails,
+            'contact' => $userDetails,
         ]);
     }
 
@@ -171,86 +141,53 @@ class LandDevelopmentController extends Controller
         
         $landDevelopment->update($validatedData); 
 
+        if($request->oldattachments){
+            foreach ($request->oldattachments as $file) {
+                // Your existing code to upload files goes here
+                // Delete the file and corresponding record if it already exists
+                $existingAttachment = LandDevelopmentAttachements::where('file_name', $file)->first();
+                if ($existingAttachment) {
+                    // Delete the file from the storage folder
+                    Storage::disk('public')->delete('land/' . $file);
+                    
+                    // Delete the record from the database
+                    $existingAttachment->delete();
+                }
+        
+            }
+        }
+        
+        if ($request->hasFile('attachments')) {
+            foreach ($request->file('attachments') as $file) {
+                // Generate unique filename based on hash and timestamp
+                $hash = md5_file($file->path()); // Generate hash of file content
+                $timestamp = time(); // Current timestamp
+                $extension = $file->getClientOriginalExtension(); // Get original file extension
+                $filename = $hash . '_' . $timestamp . '.' . $extension;
+        
+                // Check if file with the same hash already exists
+                if (!Storage::disk('public')->exists('land/' . $filename)) {
+                    // Store the uploaded file with the generated filename under the 'land' directory
+                    $file->storeAs('land', $filename);
+
+                    // Save the size of the file
+                    $size = $file->getSize();
+        
+                    // Create a new LandDevelopmentAttachment instance
+                    $attachment = new LandDevelopmentAttachements();
+                    $attachment->file_name = $filename;
+                    $attachment->size = $size;
+                    $attachment->land_development_id = $landDevelopment->id;
+                    $attachment->save();
+                }
+            }
+        }
+
         return Redirect::to('/land/'.$landDevelopment->slug.'/edit');
 
 
     }
 
-    public function updateLot(Request $request, Lot $lot){
-        $validateLot = $request->validate([
-            'size' => 'required|numeric',
-            'details' => 'nullable',
-        ]);
-
-        $lot->update($validateLot);
-
-        return redirect()->back();
-    }
-
-    public function phase(Request $request, LandDevelopment $landDevelopment){
-        try {
-            $validatedData = $request->validate([
-                'phase' => 'array|required',
-                'block' => 'array|required',
-            ]);
-    
-            foreach ($validatedData['phase'] as $index => $phaseName) {
-                // Validate phase_name uniqueness within the specified land_development_id
-                $request->validate([
-                    "phase.{$index}" => ['required', 'string', new UniquePhaseName($landDevelopment->id)],
-                ]);
-
-                // Find the last block number for this phase
-                $lastBlockNumber = Block::whereHas('phase', function ($query) use ($phaseName, $landDevelopment) {
-                    $query->where('land_development_id', $landDevelopment->id);
-                })->max(DB::raw('CAST(block_number AS UNSIGNED)')) ?? 0;
-    
-                $phase = Phase::create([
-                    'phase_name' => $phaseName,
-                    'land_development_id' => $landDevelopment->id
-                ]);
-    
-                for ($i = 0; $i < $validatedData['block'][$index]; $i++) {
-                    Block::create([
-                        'block_number' => ++$lastBlockNumber,
-                        'phase_id' => $phase->id,
-                    ]);
-                }
-            }
-    
-        } catch (ValidationException $e) {
-            dd($e);
-            // Handle validation errors
-            return Redirect::back()->withErrors(['error' => 'Somes phase has already exist for the specified land.']);
-            //return Redirect::to('/land/'.$landDevelopment->slug)->with('message', ['error' => $e->errors()])->withStatus(422);
-
-        }
-    
-        // Successfully processed the data
-        return redirect()->back();
-        
-    }
-
-    public function lot(Request $request, LandDevelopment $landDevelopment){
-
-        $validatedData = $request->validate([
-            'phase' => 'required',
-            'block' => 'required',
-            'lot' => 'required',
-        ]);
-
-        $lastLotNumber = Lot::where('block_id', $request->block)
-        ->max('lot_number') ?? 0;
-
-        for ($i = 0; $i < $validatedData['lot']; $i++) {
-          
-            Lot::create([
-                'block_id' => $request->block,
-                'lot_number' => ++$lastLotNumber,
-            ]);
-           
-        }
-    }
 
     /**
      * Remove the specified resource from storage.
@@ -259,12 +196,26 @@ class LandDevelopmentController extends Controller
     {
         $request->validate([
             'id' => 'required|array',
-            'id.*' => 'exists:contacts,id' // Assuming 'contacts' is the table name
         ]);
 
         $ids = $request->input('id');
 
+        $attachments =  LandDevelopmentAttachements::whereIn('land_development_id', $ids)->get();
+
+       
+
+        foreach ($attachments as $attachment) {
+            // Retrieve associated images for each land development
+            $images = $attachment->file_name;
+           
+            Storage::disk('public')->delete('land/' . $images);
+
+        }
+    
+
         LandDevelopment::whereIn('id', $ids)->delete();
+
+
     }
 
     private function getValidationRules($contact = null)
@@ -274,8 +225,8 @@ class LandDevelopmentController extends Controller
             'description' => ['nullable'],
             'size' => ['nullable'],
             'ground_breaking' => ['nullable'],
-            'seller_id' => ['required'],
-            'owner_id' => ['required'],
+            'seller_id' => ['nullable'],
+            'owner_id' => ['nullable'],
             'region' => ['nullable'],
             'province' => ['nullable'],
             'municipality' => ['nullable'],

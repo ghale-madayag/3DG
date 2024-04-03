@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\LandDevelopmentController;
+use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\VelzonRoutesController;
 use App\Models\LandDevelopment;
@@ -26,39 +27,36 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified',
         Route::get('/', 'dashboard');
 
         // pages routes
-        Route::get("/pages/starter", "pages_starter"); 
-        Route::get("/pages/maintenance", "pages_maintenance"); 
-        Route::get("/pages/coming-soon", "pages_coming_soon"); 
+        // Route::get("/pages/starter", "pages_starter"); 
+        // Route::get("/pages/maintenance", "pages_maintenance"); 
+        // Route::get("/pages/coming-soon", "pages_coming_soon"); 
 
         // auth sample page routes
-        Route::get("/auth/signin-basic", "auth_signin_basic");
-        Route::get("/auth/signin-cover", "auth_signin_cover");
-        Route::get("/auth/signup-basic", "auth_signup_basic");
-        Route::get("/auth/signup-cover", "auth_signup_cover");
-        Route::get("/auth/reset-pwd-basic", "auth_reset_pwd_basic");
-        Route::get("/auth/reset-pwd-cover", "auth_reset_pwd_cover");
-        Route::get("/auth/create-pwd-basic", "auth_create_pwd_basic");
-        Route::get("/auth/create-pwd-cover", "auth_create_pwd_cover");
-        Route::get("/auth/lockscreen-basic", "auth_lockscreen_basic");
-        Route::get("/auth/lockscreen-cover", "auth_lockscreen_cover");
-        Route::get("/auth/twostep-basic", "auth_twostep_basic");
-        Route::get("/auth/twostep-cover", "auth_twostep_cover");
-        Route::get("/auth/404", "auth_404");
-        Route::get("/auth/500", "auth_500");
-        Route::get("/auth/404-basic", "auth_404_basic");
-        Route::get("/auth/404-cover", "auth_404_cover");
-        Route::get("/auth/ofline", "auth_ofline");
-        Route::get("/auth/logout-basic", "auth_logout_basic");
-        Route::get("/auth/logout-cover", "auth_logout_cover");
-        Route::get("/auth/success-msg-basic", "auth_success_msg_basic");
-        Route::get("/auth/success-msg-cover", "auth_success_msg_cover");
+        // Route::get("/auth/signin-basic", "auth_signin_basic");
+        // Route::get("/auth/signin-cover", "auth_signin_cover");
+        // Route::get("/auth/signup-basic", "auth_signup_basic");
+        // Route::get("/auth/signup-cover", "auth_signup_cover");
+        // Route::get("/auth/reset-pwd-basic", "auth_reset_pwd_basic");
+        // Route::get("/auth/reset-pwd-cover", "auth_reset_pwd_cover");
+        // Route::get("/auth/create-pwd-basic", "auth_create_pwd_basic");
+        // Route::get("/auth/create-pwd-cover", "auth_create_pwd_cover");
+        // Route::get("/auth/lockscreen-basic", "auth_lockscreen_basic");
+        // Route::get("/auth/lockscreen-cover", "auth_lockscreen_cover");
+        // Route::get("/auth/twostep-basic", "auth_twostep_basic");
+        // Route::get("/auth/twostep-cover", "auth_twostep_cover");
+        // Route::get("/auth/404", "auth_404");
+        // Route::get("/auth/500", "auth_500");
+        // Route::get("/auth/404-basic", "auth_404_basic");
+        // Route::get("/auth/404-cover", "auth_404_cover");
+        // Route::get("/auth/ofline", "auth_ofline");
+        // Route::get("/auth/logout-basic", "auth_logout_basic");
+        // Route::get("/auth/logout-cover", "auth_logout_cover");
+        // Route::get("/auth/success-msg-basic", "auth_success_msg_basic");
+        // Route::get("/auth/success-msg-cover", "auth_success_msg_cover");
 
-        Route::get("/property", "property");
+        // Route::get("/property", "property");
     });
 
-    Route::controller(LandDevelopmentController::class)->group(function(){
-        Route::get("/land/create", "create");
-    });
 
     Route::controller(ContactController::class)->group(function(){
         Route::get("/contact", "index");
@@ -78,6 +76,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified',
 
     Route::controller(LandDevelopmentController::class)->group(function(){
         Route::get('/land', 'index');
+        Route::get("/land/create", "create");
         Route::post('/land/create','store');
         Route::get('/land/{land_development:slug}/edit','edit');
         Route::get('/land/{land_development:slug}', 'show');
@@ -89,6 +88,23 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified',
         Route::post('/land/lot/{lot:id}/update','updateLot');
 
         Route::delete('/land/delete','destroy');
+    });
+
+    Route::controller(ProjectController::class)->group(function(){
+        Route::get('/project/create','create');
+        Route::get('/project/{project:slug}/edit', 'edit');
+        Route::get('/project','index');
+        Route::get('/project/{project:slug}/','show');
+        
+        Route::post('/project/store','store');
+        Route::post('/project/{project:slug}/','update');
+        Route::post('/project/{project:slug}/lot', 'lot');
+        Route::post('/project/lot/{lot:id}/update', 'updateLot');
+        Route::post('/project/{project:slug}/phase', 'phase');
+
+        Route::delete('/lot/delete','destroyLot');
+        Route::delete('/block/delete','destroyBlock');
+        Route::delete('/phase/delete','destroyPhase');
     });
 
 

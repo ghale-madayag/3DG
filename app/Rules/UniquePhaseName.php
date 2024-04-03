@@ -19,7 +19,7 @@ class UniquePhaseName implements Rule
     {
         // Check if the phase_name already exists in the phases table for the given land_development_id
         return !Phase::where('phase_name', $value)
-            ->where('land_development_id', $this->landDevelopmentId)
+            ->where('project_id', $this->landDevelopmentId)
             ->exists();
     }
 

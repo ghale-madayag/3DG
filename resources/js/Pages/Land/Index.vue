@@ -79,8 +79,8 @@
             land.name,
             land.size +' '+'Sqm',
             land.address+', '+ capitalizedString(land.barangay) +', '+capitalizedString(land.municipality)+', '+capitalizedString(land.province)+', '+land.region,
-            land.seller.fname + ' ' + land.seller.lname,
-            land.owner.fname + ' ' + land.owner.lname,
+            land.seller ? land.seller.fname + ' ' + land.seller.lname : '',
+            land.owner ? land.owner.fname + ' ' + land.owner.lname : '',
             formatCreatedAt(land.created_at),
             land.slug
         ]);
@@ -181,7 +181,6 @@
     };
 
     const editRedirect = (row) => {
-        console.log(row);
         router.visit('/land/'+row.cells[7].data+'/edit')
     }
 

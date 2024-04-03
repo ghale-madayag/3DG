@@ -96,13 +96,13 @@
                             <div class="card-body">
                                 <div class="d-flex align-items-center">
                                     <div class="flex-grow-1 overflow-hidden">
-                                        <p class="text-uppercase fw-medium text-muted text-truncate mb-0">Contact</p>
+                                        <p class="text-uppercase fw-medium text-muted text-truncate mb-0">Users</p>
                                     </div>
                                 </div>
                                 <div class="d-flex align-items-end justify-content-between mt-4">
                                     <div>
-                                        <h4 class="fs-20 fw-semibold ff-secondary mb-4">{{ contact }}</h4>
-                                        <Link href="/contact" class="text-decoration-underline text-dark">View all Contact</Link>
+                                        <h4 class="fs-20 fw-semibold ff-secondary mb-4">{{ user }}</h4>
+                                        <Link href="/user" class="text-decoration-underline text-dark">View all Users</Link>
                                     </div>
                                     <div class="avatar-sm flex-shrink-0">
                                         <span class="avatar-title bg-primary-subtle rounded fs-3">
@@ -129,7 +129,7 @@
     let props = defineProps({
         auth:Object,
         land: Number,
-        contact: Number,
+        user: Number,
     })
 
     const getGreeting = () => {

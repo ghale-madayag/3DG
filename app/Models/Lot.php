@@ -9,12 +9,17 @@ class Lot extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['lot_number', 'block_id', 'size', 'details'];
+    protected $fillable = ['lot_number', 'block_id', 'size', 'description','lot_name', 'category', 'status'];
 
 
     public function block()
     {
         return $this->belongsTo(Block::class);
+    }
+
+    public function lot_images()
+    {
+        return $this->hasMany(LotImages::class);
     }
 
 }

@@ -513,6 +513,7 @@
             for (let i = 0; i < attachments.length; i++) {
                 const id = attachments[i].id;
                 const names = attachments[i].file_name;
+                const size = attachments[i].size;
 
                 // Create a mock File object
                 const mockFile = { id: id, name: names };

@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('phases', function (Blueprint $table) {
             $table->id();
             $table->string('phase_name');
-            $table->foreignId('land_development_id')->constrained('land_developments');
+            $table->foreignId('project_id')->constrained('projects');
             $table->timestamps();
         });
     }

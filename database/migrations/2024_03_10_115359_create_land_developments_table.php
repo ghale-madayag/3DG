@@ -18,10 +18,10 @@ return new class extends Migration
             $table->text('description')->nullable();
             $table->string('size')->nullable();
             $table->date('ground_breaking')->nullable();
-            $table->unsignedBigInteger('seller_id');
-            $table->foreign('seller_id')->references('id')->on('contacts');
-            $table->unsignedBigInteger('owner_id');
-            $table->foreign('owner_id')->references('id')->on('contacts');
+            $table->unsignedBigInteger('seller_id')->nullable();
+            $table->foreign('seller_id')->references('id')->on('users');
+            $table->unsignedBigInteger('owner_id')->nullable();
+            $table->foreign('owner_id')->references('id')->on('users');
             $table->string('region')->nullable();
             $table->string('province')->nullable();
             $table->string('municipality')->nullable();
