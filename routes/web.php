@@ -105,6 +105,9 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified',
         Route::delete('/lot/delete','destroyLot');
         Route::delete('/block/delete','destroyBlock');
         Route::delete('/phase/delete','destroyPhase');
+        
+        #Property
+        Route::get('/property','property');
     });
 
 

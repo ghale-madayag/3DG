@@ -362,21 +362,14 @@ class ProjectController extends Controller
 
         $totalLots = 0;
 
-        // Iterate over each phase of the project
         foreach ($project->phase as $phase) {
-            // Iterate over each block of the phase
             foreach ($phase->block as $block) {
-                // Increment the total count of lots by the count of lots in this block
                 $totalLots += $block->lot->count();
             }
         }
 
         $lastLotNumber = Lot::where('block_id', $request->block)
         ->max('lot_number') ?? 0;
-
-        // $countLot = Lot::whereHas('block', function ($query) use ($request) {
-        //     $query->where('phase_id', $request->phase);
-        // })->count();
 
         $toSave =  $validatedData['lot'];
 
@@ -521,5 +514,29 @@ class ProjectController extends Controller
         // Successfully processed the data
         return redirect()->back();
         
+    }
+
+    public function property(){
+
+        $properties = Project::with(['images', 'phase.block.lot' => function ($query) {
+            $query->where('status', 'Available'); // Filter lots by status
+        }])->get(); 
+        
+        $properties->each(function ($property) {
+            $totalLots = 0; 
+            foreach ($property->phase as $phase) { 
+                foreach ($phase->block as $block) {
+                    foreach ($block->lot as $lot) { 
+                        $totalLots++; 
+                    }
+                }
+            }
+            $property->totalLots = $totalLots;
+        });
+
+        return Inertia::render('Property/Index',[
+            'properties' => $properties,
+        ]);
+
     }
 }

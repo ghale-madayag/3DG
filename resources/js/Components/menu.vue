@@ -195,7 +195,7 @@ export default {
         <li class="nav-item">
           <a class="nav-link menu-link" href="#sidebarProject" data-bs-toggle="collapse" role="button" aria-expanded="false"
             aria-controls="sidebarProject">
-            <i class="ri-home-heart-line"></i>
+            <i class="ri-community-line"></i>
             <span data-key="t-property">{{ $t("t-project") }}</span>
           </a>
           <div class="collapse menu-dropdown" id="sidebarProject">
@@ -212,7 +212,13 @@ export default {
             </ul>
           </div>
         </li>
-        
+        <li class="nav-item">
+          <Link class="nav-link menu-link" href="/property" role="button"
+            aria-expanded="false" aria-controls="sidebarDashboards">
+            <i class="ri-home-heart-line"></i>
+            <span data-key="t-property"> {{ $t("t-property") }}</span>
+          </Link>
+        </li>
         <li class="nav-item">
           <Link class="nav-link menu-link" href="/user" role="button"
             aria-expanded="false" aria-controls="sidebarDashboards">
