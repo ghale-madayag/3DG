@@ -20,7 +20,7 @@
                 </div>
             </div>
         </div>
-        <div class="row" v-if="!debounceRunning" >
+        <div class="row" v-if="debounceRunning" >
             <div class="col-lg-12">
                 <div class="text-center mb-3">
                     <button type="button" class="btn btn-link text-success btn-lg">
@@ -33,6 +33,13 @@
                             </span>
                         </span>
                     </button>
+                </div>
+            </div>
+        </div>
+        <div class="row" v-if="!properties || !properties.length">
+            <div class="col-lg-12">
+                <div class="text-center">
+                    <p class="fs-4 text-muted">No data found</p>
                 </div>
             </div>
         </div>
@@ -107,7 +114,7 @@
     const modules = [FreeMode, Thumbs, Autoplay, Pagination, Navigation];
 
     const modalImage = ref(null);
-    let debounceRunning = false;
+    const debounceRunning = ref(null);
 
     const closeModal = () => {
         modalImage.value = null;
@@ -119,7 +126,7 @@
 
     watch([searchProject], debounce(function ([project]) {
         
-        debounceRunning = true;
+        debounceRunning.value = true;
         const params = {};
         params.project = project;
 
@@ -128,7 +135,7 @@
             preserveScroll: true,
             replace: true,
             onSuccess: () =>{
-                debounceRunning = false;
+                debounceRunning.value = false;
             }
         });
 
