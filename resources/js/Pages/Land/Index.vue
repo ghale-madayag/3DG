@@ -182,7 +182,8 @@
     };
 
     const editRedirect = (row) => {
-        router.visit('/land/'+row.cells[7].data+'/edit')
+        console.log(row)
+        router.visit('/land/'+row.cells[8].data+'/edit')
     }
 
     const deleteSelectedRows = () => {
@@ -250,7 +251,7 @@
     };
 
     const showURL = (row) => {
-        router.visit('/land/'+row.cells[7].data+'/')
+        router.visit('/land/'+row.cells[8].data+'/')
     }
 
 </script>
