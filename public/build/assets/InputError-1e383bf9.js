@@ -1,0 +1,1 @@
+import{l as s,E as a,o as t,d as r,e as n,t as o}from"./app-e06e6b03.js";const c={class:"invalid-feedback"},p={__name:"InputError",props:{message:String},setup(e){return(i,l)=>s((t(),r("div",c,[n("span",null,o(e.message),1)],512)),[[a,e.message]])}};export{p as _};
