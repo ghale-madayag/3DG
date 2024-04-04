@@ -182,7 +182,6 @@
     };
 
     const editRedirect = (row) => {
-        console.log(row)
         router.visit('/land/'+row.cells[8].data+'/edit')
     }
 
