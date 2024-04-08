@@ -4,7 +4,7 @@ import '@vueform/slider/themes/default.css';
 import '../scss/mermaid.min.css';
 
 import { createApp, h } from 'vue';
-import { createInertiaApp } from '@inertiajs/vue3';
+import { createInertiaApp, Link } from '@inertiajs/vue3';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { ZiggyVue } from '../../vendor/tightenco/ziggy/dist/vue.m';
 import BootstrapVueNext from 'bootstrap-vue-next';
@@ -43,6 +43,7 @@ createInertiaApp({
             .use(CKEditor)
             .component(VueFeather.type, VueFeather)
             .component('PhoneInput', PhoneInput)
+            .component('Link', Link)
             .mount(el);
     },
     progress: {

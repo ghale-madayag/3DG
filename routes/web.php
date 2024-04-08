@@ -71,7 +71,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified',
         Route::post("/user/store","store");
         Route::post("/user/{user}","update");
 
-        // Route::delete('/contact/delete','destroy');
+        Route::delete('/user/delete','destroy');
     });
 
     Route::controller(LandDevelopmentController::class)->group(function(){
@@ -108,6 +108,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified',
         
         #Property
         Route::get('/property','property');
+        Route::get('/property/{project:slug}/','showProperty');
     });
 
 

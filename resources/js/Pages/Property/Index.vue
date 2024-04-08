@@ -77,14 +77,14 @@
                         <div class="mt-auto">
                             <div class="d-flex mb-2">
                                 <div class="flex-grow-1">
-                                    <div>Occupied</div>
+                                    <div>Available</div>
                                 </div>
                                 <div class="flex-shrink-0">
                                     <div><i class="ri-list-check align-bottom me-1 text-muted"></i> {{ property.totalLots }}/{{ property.total_units }}</div>
                                 </div>
                             </div>
                             <div class="progress progress-sm animated-progress">
-                                <div class="progress-bar bg-success" role="progressbar" aria-valuenow="34" aria-valuemin="0" aria-valuemax="100" style="width: 34%;"></div><!-- /.progress-bar -->
+                                <div class="progress-bar bg-success" role="progressbar" aria-valuenow="34" aria-valuemin="0" aria-valuemax="100" :style="{ width: progressBarWidth(property.totalLots,property.total_units) }"></div><!-- /.progress-bar -->
                             </div><!-- /.progress -->
                         </div>
                     </div>
@@ -136,6 +136,11 @@
     const openImage = (image) => {
         modalImage.value = image;
     };
+
+    const progressBarWidth = (available, total_units) => {
+        const percentage = (available / total_units) * 100;
+        return `${percentage}%`;
+    }
 
     watch([searchProject], debounce(function ([project]) {
         

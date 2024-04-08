@@ -9,6 +9,10 @@ export default {
     pageTitle: {
       type: String,
       default: "",
+    },
+    url:{
+      type: String,
+      default: "#",
     }
   },
 };
@@ -24,7 +28,7 @@ export default {
         <div class="page-title-right">
           <ol class="breadcrumb m-0">
             <li class="breadcrumb-item">
-              <BLink href="javascript: void(0);">{{ pageTitle }}</BLink>
+              <BLink :href="url">{{ pageTitle }}</BLink>
             </li>
             <li class="breadcrumb-item active">{{ title }}</li>
           </ol>

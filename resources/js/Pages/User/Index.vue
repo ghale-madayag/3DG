@@ -367,7 +367,7 @@
             if (result.isConfirmed) {
                 formDel.id = selectedRows;
                 console.log(formDel.id)
-                formDel.delete('/contact/delete',{
+                formDel.delete('/user/delete',{
                     id: selectedRows.value,
                     onSuccess: () => {
                         const formattedData = formatContactData(props.contacts);
@@ -393,7 +393,7 @@
 
 
     const submitButtonText = computed(() => {
-        return editingMode.value ? 'Edit Contact' : 'Add Contact';
+        return editingMode.value ? 'Edit User' : 'Add User';
     });
 
     function formatCreatedAt(dateString) {

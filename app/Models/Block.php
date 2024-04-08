@@ -31,6 +31,13 @@ class Block extends Model
                  ->where('id', $filters['block']);
         }
 
+        if (isset($filters['property'])) {
+            $query->whereHas('lot', function ($query) use ($filters) {
+                $query->where('lot_name', 'like', '%' . $filters['property'] . '%');
+            });
+        }
+
+        
         return $query;
     }
 }

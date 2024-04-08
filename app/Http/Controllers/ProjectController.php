@@ -18,6 +18,8 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Pagination\Paginator;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class ProjectController extends Controller
 {
@@ -382,6 +384,7 @@ class ProjectController extends Controller
                 Lot::create([
                     'block_id' => $request->block,
                     'lot_number' => ++$lastLotNumber,
+                    'lot_name' => 'Lot '. $lastLotNumber,
                     'status' => 'Available',
                 ]);
             
@@ -519,7 +522,7 @@ class ProjectController extends Controller
     public function property(){
 
         $properties = Project::with(['images', 'phase.block.lot' => function ($query) {
-            $query->where('status', 'Available'); // Filter lots by status
+            $query->where('status', '!=', 'Available'); // Filter lots by status
         }])->filter(request(['project']))
         ->get(); 
         
@@ -532,12 +535,48 @@ class ProjectController extends Controller
                     }
                 }
             }
-            $property->totalLots = $totalLots;
+            $property->totalLots = $property->total_units - $totalLots;
         });
 
         return Inertia::render('Property/Index',[
             'properties' => $properties,
         ]);
 
+    }
+
+    public function showProperty(Request $request, Project $project){
+
+
+        $properties = Lot::with('lot_images','block','block.phase')
+        ->whereHas('block.phase', function ($query) use ($project){
+            $query->where('project_id', $project->id);
+        })->filter(request(['property','phase','block']))
+        ->paginate(9);
+
+        $project->load('phase', 'phase.block');
+        //$project->phase->load('block');
+
+        $blocks = Block::with('phase','lot.lot_images')->whereHas('phase', function ($query) use ($project) {
+            $query->where('project_id', $project->id);
+        })->filter(request(['phase','block']))
+        ->get();
+
+        $phaseFilter = $this->formattedDetails($project->phase, 'id', 'phase_name', '');
+        $blockFilter = $this->formattedDetails($blocks, 'id', 'block_number', 'Block ');
+
+        $project = Project::with(['images', 'land', 'attachments', 'phase.block.lot' => function ($query) {
+            $query->where('status', '!=', 'Available'); // Filter lots by status
+        }])
+        ->where('id', $project->id)
+        ->first();
+
+        $project->available = $project->total_units - $project->phase->flatMap->block->flatMap->lot->count();
+      
+        return Inertia::render('Property/Show',[
+            'properties' => $properties,
+            'project' => $project,
+            'phaseFilter' => $phaseFilter,
+            'blockFilter' => $blockFilter,
+        ]);
     }
 }

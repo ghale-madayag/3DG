@@ -60,7 +60,7 @@
     };
 
     const formatAddress = (land) =>{
-        return  capitalizedString(land.address ? land.address : '')+', '+capitalizedString(land.barangay)+', '+capitalizedString(land.municipality)+', '+capitalizedString(land.province)+', '+capitalizedString(land.region);
+        return  capitalizedString(land.address ? land.address : '')+capitalizedString(land.barangay)+', '+capitalizedString(land.municipality)+', '+capitalizedString(land.province)+', '+capitalizedString(land.region);
     }
 
     const capitalizedString = (inputString) => {

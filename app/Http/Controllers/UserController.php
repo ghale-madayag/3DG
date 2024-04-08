@@ -75,12 +75,12 @@ class UserController extends Controller
     
         // If $contact is provided (for update), exclude unique validation for email and phone
         if ($contact) {
-            $rules['phone'][] = 'unique:contacts,phone,' . $contact->id;
-            $rules['email'][] = 'unique:contacts,email,' . $contact->id;
+            $rules['phone'][] = 'unique:users,phone,' . $contact->id;
+            $rules['email'][] = 'unique:users,email,' . $contact->id;
         } else {
             // If it's a store operation, include unique validation for email and phone
-            $rules['phone'][] = 'unique:contacts';
-            $rules['email'][] = 'unique:contacts';
+            $rules['phone'][] = 'unique:users';
+            $rules['email'][] = 'unique:users';
         }
     
         return $rules;
@@ -104,5 +104,18 @@ class UserController extends Controller
         }else{
             $user->assignRole('contact');
         }
+    }
+
+    public function destroy(Request $request)
+    {
+        $request->validate([
+            'id' => 'required|array',
+            'id.*' => 'exists:users,id' // Assuming 'contacts' is the table name
+        ]);
+
+        $ids = $request->input('id');
+
+        User::whereIn('id', $ids)->delete();
+        return redirect('/user');
     }
 }
