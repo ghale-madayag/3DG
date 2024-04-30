@@ -81,4 +81,12 @@ class User extends Authenticatable implements MustVerifyEmail
             'label' => $this->fname . ' ' . $this->lname,
         ];
     }
+
+    public function agent_client(){
+        return $this->hasMany(AgentClient::class, 'agent_id');
+    }
+
+    public function reservation(){
+        return $this->hasMany(PropertyReservation::class,'agent_id');
+    }
 }

@@ -2,7 +2,9 @@
 
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\LandDevelopmentController;
+use App\Http\Controllers\PaymentsInvoiceController;
 use App\Http\Controllers\ProjectController;
+use App\Http\Controllers\PropertyLedgerController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\VelzonRoutesController;
 use App\Models\LandDevelopment;
@@ -109,6 +111,25 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified',
         #Property
         Route::get('/property','property');
         Route::get('/property/{project:slug}/','showProperty');
+    });
+
+    Route::controller(PaymentsInvoiceController::class)->group(function(){
+        Route::get('/payments-invoice', 'index');
+        Route::get('/payments-invoice/create', 'create');
+        Route::get('/payments-invoice/{paymentsInvoice}/edit', 'edit');
+        Route::get('/payments-invoice/{paymentsInvoice}','show');
+
+        Route::post('/payments-invoice/store', 'store');
+        Route::post('/payments-invoice/update', 'update');
+        Route::post('/payments-invoice/{paymentsInvoice}/update','updateInvoice');
+    });
+
+    Route::controller(PropertyLedgerController::class)->group(function(){
+        Route::get('/my-property', 'index');
+        Route::get('/my-ledger/{property}', 'show');
+        Route::get('/my-commission','commission');  
+
+        Route::post('/my-ledger/{propertyLedger}/update', 'update');
     });
 
 

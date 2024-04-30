@@ -3,7 +3,7 @@
         <Head title="User List">
             <meta name="viewport" content="your content" />
         </Head>
-        <PageHeader title="User" pageTitle="Dashboard" />
+        <PageHeader :title="roles == 'administrator' ? 'User': 'Client'" :pageTitle="roles == 'administrator' ? 'Dashboard' : 'Client'" />
         <div class="row">
             <div class="col-lg-12">
                 <div class="card">
@@ -12,7 +12,7 @@
                         <div class="row g-4 align-items-center">
                             <div class="col-sm">
                                 <div>
-                                    <h5 class="card-title mb-0">User List</h5>
+                                    <h5 class="card-title mb-0" v-html="roles == 'administrator' ? 'User list' : 'Client List'"></h5>
                                 </div>
                             </div>
                             <div class="col-sm-auto">
@@ -69,15 +69,22 @@
                                 <textarea class="form-control" v-model="form.other_details" :class="{ 'is-invalid': form.errors.other_details }" id="other_details" rows="3"></textarea>
                                 <div class="invalid-feedback">{{ form.errors.other_details  }}</div>
                             </div>
-                            <div>
+                            <div v-if="roles == 'administrator'">
                                 <label for="role">Select Role</label>
                                 <select class="form-select mb-3" v-model="form.roles" aria-label="Default select example">
-                                    <option selected>Select Role</option>
+                                    <option selected disabled>Select Role</option>
                                     <option value="contact">Contact Person</option>
                                     <option value="client">Client</option>
                                     <option value="agent">Agent</option>
                                     <option value="staff">Staff</option>
                                     <option value="administrator">Administrator</option>
+                                </select>
+                            </div>
+                            <div v-else>
+                                <label for="role">Select Role</label>
+                                <select class="form-select mb-3" v-model="form.roles" aria-label="Default select example">
+                                    <option selected disabled>Select Role</option>
+                                    <option value="client">Client</option>
                                 </select>
                             </div>
                         </div>
@@ -116,6 +123,7 @@
 
     let props = defineProps({
         contacts: Object,
+        roles: String,
     })
 
     const editingMode = ref(false);
@@ -161,8 +169,6 @@
         editingMode.value = true;
         showModal.value = true;
 
-        console.log(row)
-
         form.id = row.cells[0].data;
         form.fname = row.cells[1].data;
         form.lname = row.cells[2].data;
@@ -192,17 +198,14 @@
             contact.address,
             contact.other_details,
             formatCreatedAt(contact.created_at),
-            contact.roles[0].name,
+            props.roles == 'administrator' ? contact.roles[0].name : contact.roles[0],
         ]);
     };
-
-    
 
 
     onMounted(() => {
 
         const formattedData = formatContactData(props.contacts)
-        console.log(formattedData);
         grid = new Grid({
             columns: [{
                 id: 'checkboxCol',
@@ -366,7 +369,6 @@
         }).then((result) => {
             if (result.isConfirmed) {
                 formDel.id = selectedRows;
-                console.log(formDel.id)
                 formDel.delete('/user/delete',{
                     id: selectedRows.value,
                     onSuccess: () => {
@@ -388,7 +390,6 @@
                 });
             }
         })
-       
     }
 
 

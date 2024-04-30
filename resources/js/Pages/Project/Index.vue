@@ -119,9 +119,9 @@
                     formatter: (cell, row) => {
                         return h('ul', { className: 'list-inline hstack gap-2 mb-0' }, [
                             h('li', { className: 'list-inline-item', 'data-bs-toggle': 'tooltip', 'data-bs-trigger': 'hover', 'data-bs-placement': 'top', title: 'View' }, [
-                            h('a', { href: '#', className: 'text-info d-inline-block', onClick:() => showURL(row) }, [
-                                h('i', { className: 'ri-eye-fill fs-16' })
-                            ])
+                                h('a', { href: '#', className: 'text-info d-inline-block', onClick:() => showURL(row) }, [
+                                    h('i', { className: 'ri-eye-fill fs-16' })
+                                ])
                             ]),
                             h('li', { className: 'list-inline-item edit', 'data-bs-toggle': 'tooltip', 'data-bs-trigger': 'hover', 'data-bs-placement': 'top', title: 'Edit' }, [
                                 h('a', { href: '#', className: 'text-primary d-inline-block edit-item-btn', onClick: () => editUrl(row) }, [

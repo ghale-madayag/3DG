@@ -9,7 +9,7 @@ class Lot extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['lot_number', 'block_id', 'size', 'description','lot_name', 'category', 'status'];
+    protected $fillable = ['lot_number', 'block_id', 'size', 'description','lot_name', 'category', 'status', 'type'];
 
     public function scopeFilter($query, array $filters)
     {

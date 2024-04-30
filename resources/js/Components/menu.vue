@@ -149,14 +149,14 @@ export default {
         <li class="menu-title">
           <span data-key="t-menu"> {{ $t("t-menu") }}</span>
         </li>
-       <div v-if="$page.props.roles == 'administrator'">
-            <li class="nav-item">
-              <Link class="nav-link menu-link" href="/" role="button"
-                aria-expanded="false" aria-controls="sidebarDashboards">
-                <i class="ri-dashboard-2-line"></i>
-                <span data-key="t-dashboards"> {{ $t("t-dashboards") }}</span>
-              </Link>
-              <!-- <div class="collapse menu-dropdown" id="sidebarDashboards">
+        <div v-if="$page.props.roles == 'administrator'">
+          <li class="nav-item">
+            <Link class="nav-link menu-link" href="/" role="button" aria-expanded="false"
+              aria-controls="sidebarDashboards">
+            <i class="ri-dashboard-2-line"></i>
+            <span data-key="t-dashboards"> {{ $t("t-dashboards") }}</span>
+            </Link>
+            <!-- <div class="collapse menu-dropdown" id="sidebarDashboards">
                 <ul class="nav nav-sm flex-column">
                   <li class="nav-item">
                     <Link href="/" class="nav-link" data-key="t-ecommerce">
@@ -165,71 +165,82 @@ export default {
                   </li>
                 </ul>
               </div> -->
-            </li>
-            <li class="nav-item">
-              <Link class="nav-link menu-link" href="#" role="button"
-                aria-expanded="false">
-                <i class="ri-exchange-dollar-line"></i>
-                <span data-key="t-transaction"> {{ $t("t-transaction") }}</span>
-              </Link>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link menu-link" href="#sidebarLandDev" data-bs-toggle="collapse" role="button" aria-expanded="false"
-                aria-controls="sidebarLandDev">
-                <i class="ri-landscape-line"></i>
-                <span data-key="t-land">{{ $t("t-land") }}</span>
-              </a>
-              <div class="collapse menu-dropdown" id="sidebarLandDev">
-                <ul class="nav nav-sm flex-column">
-                  <li class="nav-item">
-                    <Link href="/land/create" class="nav-link">Add
-                    </Link>
-                  </li>
-                  <li class="nav-item">
-                    <Link href="/land" class="nav-link">
-                      List
-                    </Link>
-                  </li>
-                </ul>
-              </div>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link menu-link" href="#sidebarProject" data-bs-toggle="collapse" role="button" aria-expanded="false"
-                aria-controls="sidebarProject">
-                <i class="ri-community-line"></i>
-                <span data-key="t-property">{{ $t("t-project") }}</span>
-              </a>
-              <div class="collapse menu-dropdown" id="sidebarProject">
-                <ul class="nav nav-sm flex-column">
-                  <li class="nav-item">
-                    <Link href="/project/create" class="nav-link">Add
-                    </Link>
-                  </li>
-                  <li class="nav-item">
-                    <Link href="/project" class="nav-link">
-                      List
-                    </Link>
-                  </li>
-                </ul>
-              </div>
-            </li>
-            <li class="nav-item">
-              <Link class="nav-link menu-link" href="/user" role="button"
-                aria-expanded="false" aria-controls="sidebarDashboards">
-                <i class="ri-user-2-fill"></i>
-                <span data-key="t-user"> {{ $t("t-user") }}</span>
-              </Link>
-            </li>
-       </div>
-        <li class="nav-item">
-          <Link class="nav-link menu-link" href="/property" role="button"
-            aria-expanded="false">
-            <i class="ri-home-heart-line"></i>
-            <span data-key="t-property"> {{ $t("t-property") }}</span>
+          </li>
+          <li class="nav-item">
+            <Link class="nav-link menu-link" href="/payments-invoice" role="button" aria-expanded="false">
+            <i class="ri-exchange-dollar-line"></i>
+            <span data-key="t-transaction"> {{ $t("t-transaction") }}</span>
+            </Link>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link menu-link" href="#sidebarLandDev" data-bs-toggle="collapse" role="button"
+              aria-expanded="false" aria-controls="sidebarLandDev">
+              <i class="ri-landscape-line"></i>
+              <span data-key="t-land">{{ $t("t-land") }}</span>
+            </a>
+            <div class="collapse menu-dropdown" id="sidebarLandDev">
+              <ul class="nav nav-sm flex-column">
+                <li class="nav-item">
+                  <Link href="/land/create" class="nav-link">Add
+                  </Link>
+                </li>
+                <li class="nav-item">
+                  <Link href="/land" class="nav-link">
+                  List
+                  </Link>
+                </li>
+              </ul>
+            </div>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link menu-link" href="#sidebarProject" data-bs-toggle="collapse" role="button"
+              aria-expanded="false" aria-controls="sidebarProject">
+              <i class="ri-community-line"></i>
+              <span data-key="t-property">{{ $t("t-project") }}</span>
+            </a>
+            <div class="collapse menu-dropdown" id="sidebarProject">
+              <ul class="nav nav-sm flex-column">
+                <li class="nav-item">
+                  <Link href="/project/create" class="nav-link">Add
+                  </Link>
+                </li>
+                <li class="nav-item">
+                  <Link href="/project" class="nav-link">
+                  List
+                  </Link>
+                </li>
+              </ul>
+            </div>
+          </li>
+        </div>
+        <li class="nav-item" v-if="$page.props.roles != 'administrator'">
+          <Link class="nav-link menu-link" href="/my-commission" role="button" aria-expanded="false">
+          <i class="ri-dashboard-2-line"></i>
+          <span data-key="t-dashboards"> {{ $t("t-dashboards") }}</span>
           </Link>
         </li>
-      
-        
+        <li class="nav-item">
+          <Link class="nav-link menu-link" href="/property" role="button" aria-expanded="false">
+          <i class="ri-home-heart-line"></i>
+          <span data-key="t-property"> {{ $t("t-property") }}</span>
+          </Link>
+        </li>
+        <li class="nav-item">
+          <Link class="nav-link menu-link" href="/user" role="button" aria-expanded="false"
+            aria-controls="sidebarDashboards">
+          <i class="ri-user-2-fill"></i>
+          <span  v-if="$page.props.roles != 'administrator'"> Client</span>
+          <span  v-else> User</span>
+          </Link>
+        </li>
+        <li class="nav-item" v-if="$page.props.roles != 'administrator'">
+          <Link class="nav-link menu-link" href="/my-property" role="button" aria-expanded="false">
+          <i class="ri-home-smile-line"></i>
+          <span data-key="t-property"> {{ $t("t-my-property") }}</span>
+          </Link>
+        </li>
+
+
         <!-- end Dashboard Menu -->
 
         <!-- <li class="menu-title">
@@ -523,12 +534,13 @@ export default {
           </ul>
         </div>
         </li> -->
-    </ul>
-  </template>
-</BContainer></template>
+      </ul>
+    </template>
+  </BContainer>
+</template>
 
 <script setup>
-  let props = defineProps({
-    roles: Object,
-  })
+let props = defineProps({
+  roles: Object,
+})
 </script>

@@ -106,12 +106,12 @@
                             <div class="col-sm-2 pt-4">
                                 <div>
                                     <button type="button" class="btn btn-outline-ligth btn-icon waves-effect waves-light text-danger mt-1" v-show="index!==0" @click="index !== 0 && removePhase(index)" >
-                                    <span class="icon-off"><i class="ri-delete-bin-line"></i> </span>
+                                        <span class="icon-off"><i class="ri-delete-bin-line"></i> </span>
                                     </button>
                                 </div>
                             </div>
                         </div>
-                        <div class="colo-sm-6">
+                        <div class="col-sm-6">
                             <button type="button" class="btn btn-outline-success waves-effect waves-light btn-sm" @click="addPhase" >
                                 <span class="icon-off"><i class="ri-add-line"></i> Add</span>
                             </button>

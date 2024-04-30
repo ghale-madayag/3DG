@@ -302,7 +302,7 @@ export default {
                   </a>
                 </li>
                 <li>
-                  <a href="#sidebarAuth" class="nav-icon" role="button" @click.prevent="updateMenu('sidebarAuth', $event)">
+                  <a href="#sidebarLandDev" class="nav-icon" role="button" @click.prevent="updateMenu('sidebarAuth', $event)">
                     <i class="ri-account-circle-line"></i>
                   </a>
                 </li>
@@ -323,67 +323,67 @@ export default {
                 <li class="menu-title">
                   <span data-key="t-menu"> {{ $t("t-menu") }}</span>
                 </li>
-                <li class="nav-item">
-                  <Link class="nav-link menu-link" href="/" role="button"
-                    aria-expanded="false" aria-controls="sidebarDashboards">
-                    <i class="ri-dashboard-2-line"></i>
-                    <span data-key="t-dashboards"> {{ $t("t-dashboards") }}</span>
-                  </Link>
-                  <!-- <div class="collapse menu-dropdown" id="sidebarDashboards">
-                    <ul class="nav nav-sm flex-column">
-                      <li class="nav-item">
-                        <Link href="/" class="nav-link" data-key="t-ecommerce">
-                        {{ $t("t-ecommerce") }}
-                        </Link>
-                      </li>
-                    </ul>
-                  </div> -->
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link menu-link" href="#sidebarLandDev" data-bs-toggle="collapse" role="button" aria-expanded="false"
-                    aria-controls="sidebarLandDev">
-                    <i class="ri-landscape-line"></i>
-                    <span data-key="t-land">{{ $t("t-land") }}</span>
-                  </a>
-                  <div class="collapse menu-dropdown" id="sidebarLandDev">
-                    <ul class="nav nav-sm flex-column">
-                      <li class="nav-item">
-                        <Link href="/land/create" class="nav-link">Add
-                        </Link>
-                      </li>
-                      <li class="nav-item">
-                        <Link href="/land" class="nav-link">
-                          List
-                        </Link>
-                      </li>
-                    </ul>
-                  </div>
-                </li>
-                <li class="nav-item">
-          <a class="nav-link menu-link" href="#sidebarProject" data-bs-toggle="collapse" role="button" aria-expanded="false"
-            aria-controls="sidebarProject">
-            <i class="ri-home-heart-line"></i>
-            <span data-key="t-property">{{ $t("t-project") }}</span>
-          </a>
-          <div class="collapse menu-dropdown" id="sidebarProject">
-            <ul class="nav nav-sm flex-column">
+              <div v-if="$page.props.roles == 'administrator'">
+                  <li class="nav-item">
+                    <Link class="nav-link menu-link" href="/" role="button"
+                      aria-expanded="false" aria-controls="sidebarDashboards">
+                      <i class="ri-dashboard-2-line"></i>
+                      <span data-key="t-dashboards"> {{ $t("t-dashboards") }}</span>
+                    </Link>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link menu-link" href="#sidebarLandDev" data-bs-toggle="collapse" role="button" aria-expanded="false"
+                      aria-controls="sidebarLandDev">
+                      <i class="ri-landscape-line"></i>
+                      <span data-key="t-land">{{ $t("t-land") }}</span>
+                    </a>
+                    <div class="collapse menu-dropdown" id="sidebarLandDev">
+                      <ul class="nav nav-sm flex-column">
+                        <li class="nav-item">
+                          <Link href="/land/create" class="nav-link">Add
+                          </Link>
+                        </li>
+                        <li class="nav-item">
+                          <Link href="/land" class="nav-link">
+                            List
+                          </Link>
+                        </li>
+                      </ul>
+                    </div>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link menu-link" href="#sidebarProject" data-bs-toggle="collapse" role="button" aria-expanded="false"
+                      aria-controls="sidebarProject">
+                      <i class="ri-home-heart-line"></i>
+                      <span data-key="t-property">{{ $t("t-project") }}</span>
+                    </a>
+                    <div class="collapse menu-dropdown" id="sidebarProject">
+                      <ul class="nav nav-sm flex-column">
+                          <li class="nav-item">
+                            <Link href="/project/create" class="nav-link">Add
+                            </Link>
+                          </li>
+                          <li class="nav-item">
+                            <Link href="/project" class="nav-link">
+                              List
+                            </Link>
+                          </li>
+                      </ul>
+                    </div>
+                  </li>
+                  <li class="nav-item">
+                    <Link class="nav-link menu-link" href="/user" role="button"
+                      aria-expanded="false" aria-controls="sidebarDashboards">
+                      <i class="ri-user-2-fill"></i>
+                      <span data-key="t-user"> {{ $t("t-user") }}</span>
+                    </Link>
+                  </li>
+              </div>
               <li class="nav-item">
-                <Link href="/project/create" class="nav-link">Add
-                </Link>
-              </li>
-              <li class="nav-item">
-                <Link href="/project" class="nav-link">
-                  List
-                </Link>
-              </li>
-            </ul>
-          </div>
-        </li>
-                <li class="nav-item">
-                  <Link class="nav-link menu-link" href="/user" role="button"
-                    aria-expanded="false" aria-controls="sidebarDashboards">
-                    <i class="ri-user-2-fill"></i>
-                    <span data-key="t-user"> {{ $t("t-user") }}</span>
+                  <Link class="nav-link menu-link" href="/property" role="button"
+                    aria-expanded="false">
+                    <i class="ri-home-heart-line"></i>
+                    <span data-key="t-property"> {{ $t("t-property") }}</span>
                   </Link>
                 </li>
               </simplebar>

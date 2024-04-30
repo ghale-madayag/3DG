@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AgentClient;
 use App\Models\Block;
 use App\Models\LandDevelopment;
 use App\Models\Lot;
@@ -10,6 +11,7 @@ use App\Models\Phase;
 use App\Models\Project;
 use App\Models\ProjectAttachements;
 use App\Models\ProjectImages;
+use App\Models\User;
 use App\Rules\UniquePhaseName;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
@@ -20,6 +22,7 @@ use Inertia\Inertia;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Auth;
 
 class ProjectController extends Controller
 {
@@ -402,8 +405,8 @@ class ProjectController extends Controller
             'size' => 'required|numeric',
             'description' => 'nullable',
             'category' => 'required',
+            'type' => 'nullable',
         ]);
-
 
         $lot->update($validateLot);
 
@@ -550,11 +553,11 @@ class ProjectController extends Controller
         $properties = Lot::with('lot_images','block','block.phase')
         ->whereHas('block.phase', function ($query) use ($project){
             $query->where('project_id', $project->id);
-        })->filter(request(['property','phase','block']))
+        })->where('status', 'Available')
+        ->filter(request(['property','phase','block']))
         ->paginate(9);
 
         $project->load('phase', 'phase.block');
-        //$project->phase->load('block');
 
         $blocks = Block::with('phase','lot.lot_images')->whereHas('phase', function ($query) use ($project) {
             $query->where('project_id', $project->id);
@@ -571,12 +574,82 @@ class ProjectController extends Controller
         ->first();
 
         $project->available = $project->total_units - $project->phase->flatMap->block->flatMap->lot->count();
-      
+        
+        //client
+        $currentUser = Auth::user();
+        $roles = $currentUser->getRoleNames()->toArray();
+        $clients = null;
+
+        if($roles[0] == 'administrator'){
+            $clients = User::
+            orderBy('created_at', 'desc')
+            ->get();
+            $clientDetails = $this->generateAgentDetails($clients);
+
+
+        }else{
+            $clients = $currentUser->agent_client()
+            ->with('user')
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+            $clientDetails = $this->generateContactDetails($clients);
+        }
+
+        //agent
+        $agent = User::role('agent')->orderBy('fname', 'asc')
+            ->where('id', '!=', $currentUser->id)
+            ->get();
+
+        $agentDetails = $this->generateAgentDetails($agent);
+
         return Inertia::render('Property/Show',[
             'properties' => $properties,
             'project' => $project,
             'phaseFilter' => $phaseFilter,
             'blockFilter' => $blockFilter,
+            'clients' => $clientDetails,
+            'agents' => $agentDetails
         ]);
+    }
+
+    function generateContactDetails(Collection $user): array
+    {
+        $userDetails = $user->map(function ($user) {
+            return [
+                'value' => $user->user->id,
+                'label' => $user->user->fname . ' ' . $user->user->lname,
+            ];
+        })->toArray();
+
+        // If the collection is empty, add a default empty entry
+        if (empty($userDetails)) {
+            $userDetails[] = [
+                'value' => '',
+                'label' => '',
+            ];
+        }
+
+        return $userDetails;
+    }
+
+    function generateAgentDetails(Collection $user): array
+    {
+        $userDetails = $user->map(function ($user) {
+            return [
+                'value' => $user->id,
+                'label' => $user->fname . ' ' . $user->lname,
+            ];
+        })->toArray();
+
+        // If the collection is empty, add a default empty entry
+        if (empty($userDetails)) {
+            $userDetails[] = [
+                'value' => '',
+                'label' => '',
+            ];
+        }
+
+        return $userDetails;
     }
 }

@@ -210,12 +210,14 @@
     "t-level-2.2": "Level 2.2",
     "t-level-3.1": "Level 3.1",
     "t-level-3.2": "Level 3.2",
-    "t-property": "Property",
+    "t-property": "Properties",
     "t-land": "Land Development",
     "t-contact": "Contact",
     "t-client": "Client",
     "t-agent": "Agent",
-    "t-transaction": "Transaction",
+    "t-transaction": "Payments & Invoice",
     "t-user": "User",
-    "t-project": "Project"
+    "t-project": "Project",
+    "t-my-property": "My Property",
+    "t-my-commission": "My Commission"
 }

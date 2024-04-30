@@ -3,11 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Mail\WelcomeEmail;
+use App\Models\AgentClient;
 use App\Models\Contact;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Redirect;
 use Inertia\Inertia;
 use Illuminate\Support\Str;
 use Laravel\Fortify\Contracts\CreatesNewUsers;
@@ -26,18 +28,42 @@ class UserController extends Controller
 
         $currentUser = Auth::user();
 
-        $user = User::where('id', '!=', $currentUser->id)
-            ->where('id', '!=', '1')
-            ->where('id', '!=', $currentUser->id)
-            ->orderBy('created_at', 'desc')->get()->map(function ($user) {
-            $user->phone = $user->formatted_phone;
-            $roles = $user->getRoleNames()->toArray();
-            $user->roles = $roles;
-            return $user;
-        });
+        $roles = $currentUser->getRoleNames()->toArray();
+        $formattedData = null;
+        
+        if($roles[0] == 'administrator'){
+            $formattedData = User::with('agent_client')->where('id', '!=', $currentUser->id)
+                ->where('id', '!=', $currentUser->id)
+                ->orderBy('created_at', 'desc')->get()->map(function ($user) {
+                    $user->phone = $user->formatted_phone;
+                    $roles = $user->getRoleNames()->toArray();
+                    $user->roles = $roles;
+                    return $user;
+                });
+        }else{
+            $users = $currentUser->agent_client()
+            ->with('user')
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+            $formattedData = $users->map(function ($user) {
+                $roles = $user->user->getRoleNames()->toArray();
+                return (object) [
+                    'id' => $user->user->id,
+                    'fname' => $user->user->fname,
+                    'lname' => $user->user->lname,
+                    'phone' => $user->user->phone,
+                    'email' => $user->user->email,
+                    'address' => $user->user->address,
+                    'other_details' => $user->user->other_details,
+                    'created_at' => $user->user->created_at,
+                    'roles' => $roles,
+                ];
+            });
+        }
 
         return Inertia::render('User/Index',[
-            'contacts' => $user,
+            'contacts' => $formattedData,
         ]);
     }
 
@@ -45,19 +71,33 @@ class UserController extends Controller
     {
 
         $validatedData = $request->validate($this->getValidationRules($user)); 
-        $password = Str::random(8); // Adjust the length of the password as needed
+        $password = Str::random(8);
         $user = $this->creator->create(array_merge($validatedData,['password'=> $password]));
         $user['password'] = $password;
 
+        $agentId = auth()->id(); 
+        
+        AgentClient::create([
+            'agent_id' => $agentId,
+            'client_id' => $user->id,
+        ]);
+        
         $this->sendEmailVerification($user, $request->roles);
 
+        return Redirect::back()->with('message', 'Registered Successfully. Please inform them to verify using their email address');
     }
 
     public function update(Request $request, User $user)
     {
+
         $validatedData = $request->validate($this->getValidationRules($user));   
         
         $user->update($validatedData);
+
+        if ($request->has('roles')) {
+            // Sync the roles with the user
+            $user->syncRoles($request->roles);
+        }
         
     }
 

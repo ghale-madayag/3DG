@@ -9,7 +9,7 @@ Password: {{ $user->password }}
 
 After logging in, we kindly ask you to verify your email address once again to ensure the security of your account.
 
-<x-mail::button :url="'https://3dgrealtydevelopment.com/'">
+<x-mail::button :url="'https://app.3dgrealtydevelopment.com/'">
     Login
 </x-mail::button>
 

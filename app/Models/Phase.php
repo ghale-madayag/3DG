@@ -23,4 +23,8 @@ class Phase extends Model
 
         return $query;
     }
+
+    public function project(){
+        return $this->belongsTo(Project::class);
+    }
 }

@@ -522,9 +522,20 @@
                                                             </div>
                                                         </div>
                                                         <div class="col-lg-6 mb-3">
-                                                            <div class="form-group">
+                                                            <div class="form-group mb-4">
                                                                 <label for="details" class="form-label">Description</label>
                                                                 <ckeditor :editor="editor" v-model="formLotDetails.description" :config="editorConfig"></ckeditor>
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label for="details" class="form-label me-4">Type</label>
+                                                                <div class="form-check form-check-inline">
+                                                                    <input class="form-check-input" type="radio" v-model="formLotDetails.type" id="radLot" value="Lot">
+                                                                    <label class="form-check-label" for="radLot">Lot</label>
+                                                                </div>
+                                                                <div class="form-check form-check-inline">
+                                                                    <input class="form-check-input" type="radio" v-model="formLotDetails.type" id="radHouseLot" value="House & Lot">
+                                                                    <label class="form-check-label" for="radHouseLot">House & Lot</label>
+                                                                </div>
                                                             </div>
                                                         </div>
                                                         <div class="col-lg-6 mb-3">
@@ -657,6 +668,7 @@
         description: '',
         images:[],
         old_images:[],
+        type:null,
     })
 
     let formDelLot = useForm({
