@@ -13,21 +13,21 @@
                         <div class="d-flex align-items-center">
                             <div class="flex-grow-1">
                                 <p class="text-uppercase fw-medium text-muted mb-0">
-                                    Invoices Sent
+                                    Overdue Invoices
                                 </p>
                             </div>
                         </div>
                         <div class="d-flex align-items-end justify-content-between mt-4">
                             <div>
                                 <h4 class="fs-22 fw-semibold ff-secondary mb-4">
-                                    <span class="counter-value">0</span>
+                                    ₱<span class="counter-value">{{ formatNumber(overdue.total_amount) }}</span>
                                 </h4>
-                                <span class="badge bg-secondary me-1">0</span>
-                                <span class="text-muted">Invoices sent</span>
+                                <span class="badge bg-danger me-1">{{ overdue.count }}</span>
+                                <span class="text-muted">Total Invoices</span>
                             </div>
                             <div class="avatar-sm flex-shrink-0">
-                                <span class="avatar-title bg-light rounded fs-3">
-                                    <i data-feather="file-text" class="text-primary icon-dual-primary"></i>
+                                <span class="avatar-title bg-danger-subtle rounded fs-3">
+                                    <i class="ri-error-warning-line text-danger"></i>
                                 </span>
                             </div>
                         </div>
@@ -48,18 +48,21 @@
                                     Paid Invoices
                                 </p>
                             </div>
+                            <div class="flex-shrink-0">
+                                <a href="javascript:void(0);" class="badge bg-success-subtle text-success badge-border">Current Month</a>
+                            </div>
                         </div>
                         <div class="d-flex align-items-end justify-content-between mt-4">
                             <div>
                                 <h4 class="fs-22 fw-semibold ff-secondary mb-4">
-                                    ₱<span class="counter-value">0</span>
+                                    ₱<span class="counter-value">{{ formatNumber(paid.total_amount) }}</span>
                                 </h4>
-                                <span class="badge bg-secondary me-1">0</span>
+                                <span class="badge bg-success me-1">{{ paid.count }}</span>
                                 <span class="text-muted">Paid by clients</span>
                             </div>
                             <div class="avatar-sm flex-shrink-0">
-                                <span class="avatar-title bg-light rounded fs-3">
-                                    <i data-feather="check-square" class="text-primary icon-dual-primary"></i>
+                                <span class="avatar-title bg-primary-subtle rounded fs-3">
+                                    <i class="ri-money-dollar-circle-line text-primary"></i>
                                 </span>
                             </div>
                         </div>
@@ -80,18 +83,21 @@
                                     Unpaid Invoices
                                 </p>
                             </div>
+                            <div class="flex-shrink-0">
+                                <a href="javascript:void(0);" class="badge bg-info-subtle text-info badge-border">Current Month</a>
+                            </div>
                         </div>
                         <div class="d-flex align-items-end justify-content-between mt-4">
                             <div>
                                 <h4 class="fs-22 fw-semibold ff-secondary mb-4">
-                                    ₱<span class="counter-value">0</span>
+                                    ₱<span class="counter-value">{{ formatNumber(unpaid.total_amount) }}</span>
                                 </h4>
-                                <span class="badge bg-secondary me-1">0</span>
+                                <span class="badge bg-info me-1">{{ unpaid.count }}</span>
                                 <span class="text-muted">Unpaid by clients</span>
                             </div>
                             <div class="avatar-sm flex-shrink-0">
-                                <span class="avatar-title bg-light rounded fs-3">
-                                    <i data-feather="clock" class="text-primary icon-dual-primary"></i>
+                                <span class="avatar-title bg-info-subtle rounded fs-3">
+                                    <i class="ri-refund-2-line text-info"></i>
                                 </span>
                             </div>
                         </div>
@@ -109,21 +115,24 @@
                         <div class="d-flex align-items-center">
                             <div class="flex-grow-1">
                                 <p class="text-uppercase fw-medium text-muted mb-0">
-                                    Cancelled Invoices
+                                    Reservation Invoices
                                 </p>
+                            </div>
+                            <div class="flex-shrink-0">
+                                <a href="javascript:void(0);" class="badge bg-warning-subtle text-warning badge-border">Current Month</a>
                             </div>
                         </div>
                         <div class="d-flex align-items-end justify-content-between mt-4">
                             <div>
                                 <h4 class="fs-22 fw-semibold ff-secondary mb-4">
-                                    <span class="counter-value">0</span>
+                                    ₱<span class="counter-value">{{ formatNumber(reservation.total_amount) }}</span>
                                 </h4>
-                                <span class="badge bg-secondary me-1">0</span>
-                                <span class="text-muted">Cancelled</span>
+                                <span class="badge bg-warning me-1">{{ reservation.count }}</span>
+                                <span class="text-muted">Reserved by clients</span>
                             </div>
                             <div class="avatar-sm flex-shrink-0">
-                                <span class="avatar-title bg-light rounded fs-3">
-                                    <i data-feather="x-octagon" class="text-primary icon-dual-primary"></i>
+                                <span class="avatar-title bg-warning-subtle rounded fs-3">
+                                    <i class="ri-reserved-line text-warning"></i>
                                 </span>
                             </div>
                         </div>
@@ -176,7 +185,7 @@
                                         <option value="Reserved">Reserved</option>
                                         <option value="Installment">Installment</option>
                                         <option value="Fullpayment">Fullpayment</option>
-                                        <option value="Cancel">Cancel</option>
+                                        <option value="Overdue">Overdue</option>
                                     </select>
                                 </div>
                             </div>
@@ -211,6 +220,10 @@ const selectStat = ref('all');
 let props = defineProps({
     property: Object,
     message: String,
+    overdue: Object,
+    paid: Object,
+    unpaid: Object,
+    reservation: Object,
 })
 
 onMounted(() => {
@@ -265,10 +278,10 @@ onMounted(() => {
                         badge = 'bg-secondary';
                     } else if (cell == 'Installment') {
                         badge = 'bg-info';
-                    } else if (cell == 'Pending') {
-                        badge = 'bg-danger';
-                    } else {
+                    } else if (cell == 'Fullpayment'){
                         badge = 'bg-success';
+                    }else {
+                        badge = 'bg-danger';
                     }
 
                     return h('span', { className: 'badge ' + badge, onClick: () => editModal(row) }, [
@@ -277,7 +290,7 @@ onMounted(() => {
                 },
                 sort: false
             },
-            { name: 'Date' },
+            { name: 'Due Date' },
             {
                 id: 'actionsColumn',
                 name: 'Actions',
@@ -304,7 +317,7 @@ onMounted(() => {
                                     h('i', { className: 'ri-file-list-3-line fs-16' })
                                 ])
                             ]) : null,
-                        status != 'Reserved' && status != 'Pending' ?
+                        status != 'Reserved' && status != 'Pending' && status != 'Overdue' ?
                             h('li', { className: 'list-inline-item', 'data-bs-toggle': 'tooltip', 'data-bs-trigger': 'hover', 'data-bs-placement': 'top', title: 'Download Invoice' }, [
                                 h('a', { href: 'javascript:void(0);', className: 'view-item-btn', onClick: () => download(row) }, [
                                     h('i', { className: 'ri-download-2-line text-muted' })
@@ -346,8 +359,7 @@ const formatData = property => {
         '₱' + " " + formatNumber(property.total_price),
         '₱' + " " + formatNumber(property.reservation_fee),
         property.status,
-        formatCreatedAt(property.created_at),
-
+        property.status !== 'Reserved' && property.status !== 'Pending' ? (property.status === 'Overdue' ? formatCreatedAt(property.date_due) : formatDate(property.updated_at)) : formatCreatedAt(property.date_due),
     ]);
 };
 
@@ -361,6 +373,13 @@ const formatCreatedAt = (dateString) => {
 
     return date.toLocaleDateString('en-US', options);
 };
+
+const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    const dayOfMonth = date.getDate();
+    return `${dayOfMonth}th of the Month`;
+}
+
 
 watch([searchProp, selectStat], debounce(function ([searchVal, selectVal]) {
     const params = {};

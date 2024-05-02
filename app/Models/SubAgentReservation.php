@@ -17,7 +17,7 @@ class SubAgentReservation extends Model
 
     public function propertyReservation()
     {
-        return $this->belongsTo(PropertyReservation::class);
+        return $this->belongsTo(PropertyReservation::class,'property_reservation_id');
     }
 
     public function subAgent()

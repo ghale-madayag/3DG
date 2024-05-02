@@ -213,8 +213,8 @@ export default {
             </div>
           </li>
         </div>
-        <li class="nav-item" v-if="$page.props.roles != 'administrator'">
-          <Link class="nav-link menu-link" href="/my-commission" role="button" aria-expanded="false">
+        <li class="nav-item" v-if="$page.props.roles != 'administrator' && $page.props.roles !='client'">
+          <Link class="nav-link menu-link" :href="'/commission/'+$page.props.decrypt" role="button" aria-expanded="false">
           <i class="ri-dashboard-2-line"></i>
           <span data-key="t-dashboards"> {{ $t("t-dashboards") }}</span>
           </Link>
@@ -234,7 +234,7 @@ export default {
           </Link>
         </li>
         <li class="nav-item" v-if="$page.props.roles != 'administrator'">
-          <Link class="nav-link menu-link" href="/my-property" role="button" aria-expanded="false">
+          <Link class="nav-link menu-link" :href="'/my-property/'+$page.props.decrypt" role="button" aria-expanded="false">
           <i class="ri-home-smile-line"></i>
           <span data-key="t-property"> {{ $t("t-my-property") }}</span>
           </Link>

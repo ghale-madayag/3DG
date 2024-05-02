@@ -6,6 +6,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Crypt;
 
 class HandleInertiaRequests extends Middleware
 {
@@ -45,7 +46,8 @@ class HandleInertiaRequests extends Middleware
 
         return array_merge(parent::share($request), [
             'message' => fn () => $request->session()->get('message'),
-            'roles' => auth()->user() ? $role[0] : null
+            'roles' => auth()->user() ? $role[0] : null,
+            'decrypt' =>  auth()->user() ? Crypt::encrypt(auth()->user()->id) : null,
         ]);
     }
 }

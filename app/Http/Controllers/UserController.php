@@ -8,6 +8,7 @@ use App\Models\Contact;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Redirect;
 use Inertia\Inertia;
@@ -38,6 +39,7 @@ class UserController extends Controller
                     $user->phone = $user->formatted_phone;
                     $roles = $user->getRoleNames()->toArray();
                     $user->roles = $roles;
+                    $user->dec = Crypt::encrypt($user->id);
                     return $user;
                 });
         }else{
@@ -61,6 +63,8 @@ class UserController extends Controller
                 ];
             });
         }
+
+       // dd($formattedData);
 
         return Inertia::render('User/Index',[
             'contacts' => $formattedData,

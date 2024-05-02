@@ -12,7 +12,7 @@
                             <div class="flex-shrink-0 avatar-md mx-auto">
                                 <!-- Current Profile Photo -->
                                 <div v-show="!photoPreview">
-                                    <img :src="auth.user.profile_photo_url" :alt="auth.user.name" class="rounded-circle" width="90">
+                                    <img :src="user.profile_photo_url" :alt="user.name" class="rounded-circle" width="90">
                                 </div>
 
                                 <!-- New Profile Photo Preview -->
@@ -21,24 +21,24 @@
                                 </div>
                             </div>
                             <div class="mt-5 text-center">
-                                <h5 class="mb-1">{{ auth.user.fname }} {{ auth.user.lname }}</h5>
-                                <p class="text-muted">{{ formattedCreatedAt(auth.user.created_at) }}</p>
+                                <h5 class="mb-1">{{ user.name }}</h5>
+                                <p class="text-muted">{{ formattedCreatedAt(user.created_at) }}</p>
                             </div>
                             <div class="table-responsive">
                                 <table class="table mb-0 table-borderless">
                                     <tbody>
                                         <tr>
                                             <th><span class="fw-medium">Email:</span></th>
-                                            <td>{{ auth.user.email }}</td>
+                                            <td>{{ user.email }}</td>
                                         </tr>
 
                                         <tr>
                                             <th><span class="fw-medium">Contact No:</span></th>
-                                            <td>+{{ auth.user.phone }}</td>
+                                            <td>+{{ user.phone }}</td>
                                         </tr>
                                         <tr>
                                             <th><span class="fw-medium">Address</span></th>
-                                            <td>{{ auth.user.address }}</td>
+                                            <td>{{ user.address }}</td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -78,7 +78,7 @@
                             <div class="col-6 col-sm-3">
                                 <div class="p-3 border border-dashed border-start-0">
                                     <h5 class="mb-1">₱ <span class="counter-value"> {{  formatNumber(total) }}</span></h5>
-                                    <p class="text-muted mb-0">Total Earnings</p>
+                                    <p class="text-muted mb-0">Total Revenue</p>
                                 </div>
                             </div>
                             <!--end col-->
@@ -91,40 +91,77 @@
                         </div>
                     </div><!-- end card body -->
                 </div><!-- end card -->
-                <div class="row g-4 mb-3">
-                    <div class="col-sm-auto">
-                        <div>
-                            <Link href="/property" class="btn btn-outline-primary">
-                                <i class="ri-eye-line align-bottom me-1"></i> Browse Property
-                            </Link>
-                        </div>
-                    </div>
-                    <div class="col-sm">
-                        <div class="d-flex justify-content-sm-end">
-                            <div class="search-box ms-2">
-                                <input v-model="searchProp" type="text" class="form-control" placeholder="Search...">
-                                <i class="ri-search-line search-icon"></i>
-                            </div>
-                            <div class="input-light ms-2">
-                                <select class="form-select" v-model="selectStat">
-                                    <option value="all" selected>
-                                        All
-                                    </option>
-                                    <option value="Pending">Pending</option>
-                                    <option value="Reserved">Reserved</option>
-                                    <option value="Installment">Installment</option>
-                                    <option value="Fullpayment">Fullpayment</option>
-                                    <option value="Cancel">Cancel</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <!--tab-->
                 <div class="card">
+                    <div class="card-header">
+                        <div class="row align-items-center">
+                            <div class="col">
+                                <ul class="nav nav-tabs-custom card-header-tabs border-bottom-0" role="tablist">
+                                    <li class="nav-item">
+                                        <a class="nav-link active fw-semibold" data-bs-toggle="tab" href="#property" role="tab">
+                                            Client Transaction 
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link fw-semibold" data-bs-toggle="tab" href="#history" role="tab">
+                                            Transaction History
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="col-auto">
+                                <div id="selection-element">
+                                    <div class="my-n1 d-flex align-items-center text-muted">
+                                        Select <div id="select-content" class="text-body fw-semibold px-1"></div> Result <button type="button" class="btn btn-link link-danger p-0 ms-3" data-bs-toggle="modal" data-bs-target="#removeItemModal">Remove</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     <div class="card-body">
-                        <div class="table-card gridjs-border-none" ref="gridContainer" id="gridStyle"></div>
+                        <div class="tab-content text-muted">
+                            <div class="tab-pane active" id="property" role="tabpanel">
+                                <div class="row mb-4">
+                                    <div class="col-sm-auto">
+                                        <div>
+                                            <Link href="/property" class="btn btn-outline-primary">
+                                                <i class="ri-eye-line align-bottom me-1"></i> Browse Property
+                                            </Link>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm">
+                                        <div class="d-flex justify-content-sm-end">
+                                            <div class="search-box ms-2">
+                                                <input v-model="searchProp" type="text" class="form-control" placeholder="Search Invoice..">
+                                                <i class="ri-search-line search-icon"></i>
+                                            </div>
+                                            <div class="input-light ms-2">
+                                                <select class="form-select" v-model="selectStat">
+                                                    <option value="all" selected>
+                                                        All
+                                                    </option>
+                                                    <option value="Pending">Pending</option>
+                                                    <option value="Reserved">Reserved</option>
+                                                    <option value="Installment">Installment</option>
+                                                    <option value="Fullpayment">Fullpayment</option>
+                                                    <option value="Overdue">Overdue</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!--grid-->
+                                <div class="table-card gridjs-border-none" ref="gridContainer" id="gridStyle"></div>
+                            </div>
+                            <div class="tab-pane" id="history" role="tabpanel">
+                                <div class="table-card gridjs-border-none" ref="gridHistory"></div>
+                            </div>
+                        </div>
                     </div>
                 </div>
+                <!--end of tab-->
+              
+               
             </div>
         </div>
     </Layout>
@@ -137,10 +174,16 @@ import Layout from "@/Layouts/main.vue";
 import PageHeader from "@/Components/page-header.vue";
 import { Grid, h } from "gridjs";
 import VueApexCharts from "vue3-apexcharts";
+import { getCurrentInstance } from 'vue';
+
+const instance = getCurrentInstance();
+const currentPageUrl = instance.appContext.app.config.globalProperties.$page.url;
 
 let grid;
+let gridHis;
 const msg = ref(false);
 const gridContainer = ref(null);
+const gridHistory = ref(null);
 
 const photoPreview = ref(null);
 const selectStat = ref('all');
@@ -154,6 +197,8 @@ const props = defineProps({
     entire_month: Number,
     total: Number,
     graphData: Array,
+    user: Object,
+    commissionData: Object,
 });
 
 const options = ref({
@@ -170,21 +215,24 @@ const options = ref({
         }
         }
     },
-    stroke: {
-            curve: 'smooth'
+    zoom: {
+        enabled: false
         },
     fill: {
             type:'solid',
             opacity: [0.35, 1],
         },
+    toolbar: {
+            show: false
+          }
 });
 
 const series = ref([
-    {
-    name: 'Commission',
-    type: 'line',
-    data: props.graphData
-  },
+//     {
+//     name: 'Commission',
+//     type: 'line',
+//     data: props.graphData
+//   },
   {
     name: 'Commission',
     type: 'column',
@@ -194,6 +242,7 @@ const series = ref([
 
 onMounted(() => {
     const formattedData = formatData(props.property);
+    const formattedDataHistory = formatDataHis(props.commissionData);
 
     if (props.message !== null) {
         msg.value = true;
@@ -244,10 +293,10 @@ onMounted(() => {
                         badge = 'bg-secondary';
                     } else if (cell == 'Installment') {
                         badge = 'bg-info';
-                    } else if (cell == 'Pending') {
-                        badge = 'bg-danger';
-                    } else {
+                    } else if (cell == 'Fullpayment'){
                         badge = 'bg-success';
+                    }else{
+                        badge = 'bg-danger';
                     }
 
                     return h('span', { className: 'badge ' + badge, onClick: () => editModal(row) }, [
@@ -256,7 +305,7 @@ onMounted(() => {
                 },
                 sort: false
             },
-            { name: 'Date' },
+            { name: 'Due Date' },
             {
                 id: 'actionsColumn',
                 name: 'Actions',
@@ -310,6 +359,29 @@ onMounted(() => {
         },
     }).render(gridContainer.value);
 
+    gridHis = new Grid({
+        columns: [
+            { name: 'Invoice No.' },
+            { name: 'Total Commission'},
+            { name: 'Percentage'},
+            { name: 'Status'},
+            { name: 'Transaction Date', sort: true,},
+        ],
+        soft: true,
+        theme: 'mermaid',
+        search: false,
+        pagination: {
+            limit: 10
+        },
+        data: function () {
+            return new Promise(function (resolve) {
+                setTimeout(function () {
+                    resolve(formattedDataHistory);
+                }, 1000)
+            })
+        },
+    }).render(gridHistory.value);
+
 });
 
 const formattedCreatedAt = (createdAt) => {
@@ -330,16 +402,25 @@ const formatData = property => {
         property.lot.lot_number,
         property.lot.block.block_number,
         property.lot.block.phase.phase_name,
-        property.client.fname + " " + property.client.lname,
-        '+' + property.client.phone,
+        property.client.fname + " " + property.client.lname, '+' + property.client.phone,
         property.client.email,
         '₱' + " " + formatNumber(property.total_price),
         '₱' + " " + formatNumber(property.reservation_fee),
         property.status,
-        formatCreatedAt(property.created_at),
+        property.status!='Reserved' && property.status != 'Pending' ? formatDate(property.updated_at) : formatCreatedAt(property.date_due) ,
 
     ]);
 };
+
+const formatDataHis = property => {
+    return property.map(property => [
+        property.invoice,
+        '₱' + " " + formatNumber(property.total),
+        property.commission,
+        property.tag,
+        property.date,
+    ]);
+}
 
 const formatCreatedAt = (dateString) => {
     const date = new Date(dateString);
@@ -352,6 +433,12 @@ const formatCreatedAt = (dateString) => {
     return date.toLocaleDateString('en-US', options);
 };
 
+const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    const dayOfMonth = date.getDate();
+    return `${dayOfMonth}th of the Month`;
+}
+
 watch([searchProp, selectStat], debounce(function ([searchVal, selectVal]) {
     const params = {};
 
@@ -363,7 +450,7 @@ watch([searchProp, selectStat], debounce(function ([searchVal, selectVal]) {
         params.status = selectVal;
     }
 
-    router.get('/my-commission', params, {
+    router.get(currentPageUrl, params, {
         preserveState: true,
         preserveScroll: true,
         replace: true,

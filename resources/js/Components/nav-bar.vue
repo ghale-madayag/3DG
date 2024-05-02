@@ -130,47 +130,47 @@ export default {
 
   methods: {
     ...layoutMethods,
-    isCustomDropdown() {
-      //Search bar
-      var searchOptions = document.getElementById("search-close-options");
-      var dropdown = document.getElementById("search-dropdown");
-      var searchInput = document.getElementById("search-options");
+    // isCustomDropdown() {
+    //   //Search bar
+    //   var searchOptions = document.getElementById("search-close-options");
+    //   var dropdown = document.getElementById("search-dropdown");
+    //   var searchInput = document.getElementById("search-options");
 
-      searchInput.addEventListener("focus", () => {
-        var inputLength = searchInput.value.length;
-        if (inputLength > 0) {
-          dropdown.classList.add("show");
-          searchOptions.classList.remove("d-none");
-        } else {
-          dropdown.classList.remove("show");
-          searchOptions.classList.add("d-none");
-        }
-      });
+    //   searchInput.addEventListener("focus", () => {
+    //     var inputLength = searchInput.value.length;
+    //     if (inputLength > 0) {
+    //       dropdown.classList.add("show");
+    //       searchOptions.classList.remove("d-none");
+    //     } else {
+    //       dropdown.classList.remove("show");
+    //       searchOptions.classList.add("d-none");
+    //     }
+    //   });
 
-      searchInput.addEventListener("keyup", () => {
-        var inputLength = searchInput.value.length;
-        if (inputLength > 0) {
-          dropdown.classList.add("show");
-          searchOptions.classList.remove("d-none");
-        } else {
-          dropdown.classList.remove("show");
-          searchOptions.classList.add("d-none");
-        }
-      });
+    //   searchInput.addEventListener("keyup", () => {
+    //     var inputLength = searchInput.value.length;
+    //     if (inputLength > 0) {
+    //       dropdown.classList.add("show");
+    //       searchOptions.classList.remove("d-none");
+    //     } else {
+    //       dropdown.classList.remove("show");
+    //       searchOptions.classList.add("d-none");
+    //     }
+    //   });
 
-      searchOptions.addEventListener("click", () => {
-        searchInput.value = "";
-        dropdown.classList.remove("show");
-        searchOptions.classList.add("d-none");
-      });
+    //   searchOptions.addEventListener("click", () => {
+    //     searchInput.value = "";
+    //     dropdown.classList.remove("show");
+    //     searchOptions.classList.add("d-none");
+    //   });
 
-      document.body.addEventListener("click", (e) => {
-        if (e.target.getAttribute("id") !== "search-options") {
-          dropdown.classList.remove("show");
-          searchOptions.classList.add("d-none");
-        }
-      });
-    },
+    //   document.body.addEventListener("click", (e) => {
+    //     if (e.target.getAttribute("id") !== "search-options") {
+    //       dropdown.classList.remove("show");
+    //       searchOptions.classList.add("d-none");
+    //     }
+    //   });
+    // },
     toggleHamburgerMenu() {
       var windowSize = document.documentElement.clientWidth;
       let layoutType = document.documentElement.getAttribute("data-layout");
@@ -299,7 +299,7 @@ export default {
     if (document.getElementById("topnav-hamburger-icon"))
       document.getElementById("topnav-hamburger-icon").addEventListener("click", this.toggleHamburgerMenu);
 
-    this.isCustomDropdown();
+    //this.isCustomDropdown();
   },
 };
 </script>
@@ -340,7 +340,7 @@ export default {
           </button>
 
           <!-- App Search-->
-          <form class="app-search d-none d-md-block">
+          <!-- <form class="app-search d-none d-md-block">
             <div class="position-relative">
               <input type="text" class="form-control" placeholder="Search..." autocomplete="off" id="search-options"
                 value="" />
@@ -419,7 +419,7 @@ export default {
                     class="ri-arrow-right-line ms-1"></i></Link>
               </div>
             </div>
-          </form>
+          </form> -->
         </div>
 
         <div class="d-flex align-items-center">

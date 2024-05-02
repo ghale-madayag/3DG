@@ -194,7 +194,7 @@
                                         <i class="ri-building-3-fill text-warning align-bottom me-1" v-if="property.category"></i><span class="fw-medium">{{ property.category }}</span>
                                     </div>
                                 </div>
-                                <button class="mt-4 btn btn-soft-primary w-100" @click="openModal(property)">Reserve</button>
+                                <button class="mt-4 btn btn-soft-primary w-100" @click="openModal(property)" v-if="roles !='client'">Reserve</button>
                             </div>
                         </div>
                     </div>
@@ -366,6 +366,7 @@
         agents: Object,
         auth: Object,
         message: String,
+        roles: String,
     });
 
     let form = useForm({

@@ -5,9 +5,12 @@ namespace App\Http\Controllers;
 use App\Models\PropertyLedger;
 use App\Models\PropertyLedgerTransaction;
 use App\Models\PropertyReservation;
+use App\Models\SubAgentReservation;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Crypt;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Redirect;
 
@@ -16,9 +19,16 @@ class PropertyLedgerController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index($encryptedId)
     {   
-        $user = auth()->user()->id;
+        
+        try {
+            $currenUser  = Crypt::decrypt($encryptedId);
+        } catch (\Illuminate\Contracts\Encryption\DecryptException $e) {
+            // Handle decryption error (e.g., invalid or tampered ID)
+            abort(404); // Return 404 Not Found
+        }
+
         $property = PropertyReservation::with(['lot','lot.lot_images','lot.block','lot.block.phase','ledger',
             'ledger.ledger_trans' => function($query) {
                 $query->selectRaw('*, DATE_FORMAT(due_date, "%D of the Month") as formatted_due_date');
@@ -27,10 +37,9 @@ class PropertyLedgerController extends Controller
                 DATE_FORMAT(DATE_ADD(created_at, INTERVAL 10 DAY), "%M %e, %Y") as due_date_plus_10_days,
                 CONCAT("Due in ", DATEDIFF(DATE_ADD(created_at, INTERVAL 10 DAY), CURDATE()), " days") as due_in'
             )
-            ->where('client_id',$user)
+            ->where('client_id',$currenUser)
             ->paginate(9);
-
-        //dd($property);
+        
         return Inertia::render('Property/MyProperty',[
             'property' => $property,
         ]);
@@ -157,9 +166,14 @@ class PropertyLedgerController extends Controller
         //
     }
 
-    public function commission(){
+    public function commission($encryptedId){
 
-        $currenUser = Auth::user();
+        try {
+            $currenUser  = Crypt::decrypt($encryptedId);
+        } catch (\Illuminate\Contracts\Encryption\DecryptException $e) {
+            // Handle decryption error (e.g., invalid or tampered ID)
+            abort(404); // Return 404 Not Found
+        }
 
         $property = PropertyReservation::with([
             'lot' => function ($query) {
@@ -175,37 +189,183 @@ class PropertyLedgerController extends Controller
                 $query->select('id','phase_name');
             }
         ])
-        ->where('agent_id', $currenUser->id)
+        ->where('agent_id', $currenUser)
         ->filter(request(['search','status']))->get();
 
         // Get the current date
         $today = Carbon::today();
 
        // Determine the start and end dates for the two periods
-        $startFirstPeriod = $today->copy()->startOfMonth()->addDays(20);
-        $endFirstPeriod = $today->copy()->startOfMonth()->addMonths(1)->subDays(1);
+        $startFirstPeriod = $today->copy()->subMonth()->startOfMonth()->addDays(20);
+        $endFirstPeriod = $today->copy()->startOfMonth()->addMonths(1)->addDays(4);;
 
-        $startSecondPeriod = $today->copy()->startOfMonth();
+        $startSecondPeriod = $today->copy()->startOfMonth()->addDays(5);
         $endSecondPeriod = $today->copy()->startOfMonth()->addDays(19);
-        //dd($endSecondPeriod);
+
+       // dd($startFirstPeriod);
+        //dd($endFirstPeriod);
 
         $commissionTotal = 0;
         $commissionFirstPeriod = 0;
+
         $commissionSecondPeriod = 0;
         $commissionEntireMonth = 0;
         $commissionPerMonth = [];
+        $commissionData = [];
 
         // Retrieve all property reservations associated with the current agent
         $propertyReservations = PropertyReservation::with(['ledger.ledger_trans_list' => function($query){
             $query->orderBy('terms','asc');
         }])
-        ->where('agent_id', $currenUser->id)
-        ->where('status','Installment')
-        ->orWhere('status','Fullpayment')
+        ->where('agent_id', $currenUser)
+        ->where(function ($query) {
+            $query->where('status','Installment')
+                  ->orWhere('status','Fullpayment');
+        })
         ->get();
 
-        foreach ($propertyReservations as $reservation) {
+        $subAgentCom = SubAgentReservation::with(['propertyReservation.ledger.ledger_trans_list' => function($query){
+            $query->orderBy('terms','asc');
+        }])
+            ->where('sub_agent_id', $currenUser)
+            ->where(function ($query) {
+                $query->whereHas('propertyReservation', function ($q) {
+                    $q->where('status', 'Installment');
+                })
+                ->orWhereHas('propertyReservation', function ($q) {
+                    $q->where('status', 'Fullpayment');
+                });
+            })
+            ->get();
 
+
+        //Sub-Agent
+        foreach ($subAgentCom as $subAgent) {
+           
+            $reservation = $subAgent->propertyReservation;
+
+            if($reservation->ledger->ledger_trans_list->isEmpty()){
+                if ($reservation->ledger->updated_at >= $startFirstPeriod && $reservation->ledger->updated_at <= $endFirstPeriod) {
+                    // Calculate commission for the first period
+                   
+                    $commissionPercent = $subAgent->sub_agent_com  / 100;
+                    $commissionFirstPeriod += $reservation->ledger->total_amount * $commissionPercent;
+                    
+                }
+
+                if ($reservation->ledger->updated_at >= $startSecondPeriod && $reservation->ledger->updated_at <= $endSecondPeriod) {
+                    // Calculate commission for the first period
+                    $commissionPercent = $subAgent->sub_agent_com  / 100;
+                    $commissionSecondPeriod += $reservation->ledger->total_amount * $commissionPercent;
+                }
+
+                if ($reservation->ledger->updated_at->isSameMonth($today)) {
+                    // Calculate and add the commission to the total for the entire month
+                    $commissionPercent = $subAgent->sub_agent_com  / 100;
+                    $commissionEntireMonth += $reservation->ledger->total_amount * $commissionPercent;
+
+                }
+
+                // Extract the month and year from the transaction's updated_at timestamp
+                $monthYear = Carbon::parse($reservation->ledger->updated_at)->format('F');
+
+                // Calculate the commission earned for this transaction
+                $commissionPercent = $subAgent->sub_agent_com  / 100;
+                $commission = $reservation->ledger->total_amount * $commissionPercent;
+
+                $commissionData[] = [
+                    'invoice' => $reservation->invoice_number,
+                    'total' => $reservation->ledger->total_amount * $commissionPercent,
+                    'commission' => intval($subAgent->sub_agent_com).'%', 
+                    'tag' => 'Sub-Agent',
+                    'date' => $reservation->ledger->updated_at->format('Y-m-d'), // Format date as needed
+                ];
+    
+                // Add the commission to the total earnings for this month
+                if (!isset($commissionPerMonth[$monthYear])) {
+                    $commissionPerMonth[$monthYear] = 0;
+                }
+
+                $commissionPerMonth[$monthYear] += $commission;
+                $commissionTotal +=  $reservation->ledger->total_amount * $commissionPercent;
+            
+            }else{
+
+                foreach ($reservation->ledger->ledger_trans_list as $transaction) {
+                
+                    if ($transaction->payment_status === 'Paid' &&
+                        $transaction->updated_at >= $startFirstPeriod &&
+                        $transaction->updated_at <= $endFirstPeriod) {
+                        // Calculate and add the commission to the total for the first period
+                        $commissionPercent = $subAgent->sub_agent_com / 100;
+                        $commissionFirstPeriod += $transaction->monthly_payment * $commissionPercent;
+                    
+                    }
+                }
+
+                foreach ($reservation->ledger->ledger_trans_list as $transaction) {
+                    if ($transaction->payment_status === 'Paid' &&
+                        $transaction->updated_at >= $startSecondPeriod &&
+                        $transaction->updated_at <= $endSecondPeriod) {
+                        // Calculate and add the commission to the total for the second period
+                        $commissionPercent = $subAgent->sub_agent_com / 100;
+                        $commissionSecondPeriod += $transaction->monthly_payment * $commissionPercent;
+                    }
+                }
+        
+                // Sum up commission from associated ledger transactions for the entire month
+                foreach ($reservation->ledger->ledger_trans_list as $transaction) {
+                    if ($transaction->payment_status === 'Paid' &&
+                        $transaction->updated_at->isSameMonth($today)) {
+                        // Calculate and add the commission to the total for the entire month
+                        $commissionPercent = $subAgent->sub_agent_com / 100;
+                        $commissionEntireMonth += $transaction->monthly_payment * $commissionPercent;
+                    }
+                }
+    
+                 // Sum up commission from associated ledger transactions for the entire transaction
+                 foreach ($reservation->ledger->ledger_trans_list as $transaction) {
+                    if ($transaction->payment_status === 'Paid') {
+                        // Calculate and add the commission to the total for the entire month
+                        $commissionPercent = $subAgent->sub_agent_com / 100;
+                        $commissionTotal += $transaction->monthly_payment * $commissionPercent;
+
+                        $commissionData[] = [
+                            'invoice' => $reservation->invoice_number,
+                            'total' => $transaction->monthly_payment * $commissionPercent,
+                            'commission' => intval($subAgent->sub_agent_com).'%', 
+                            'tag' => 'Sub-Agent',
+                            'date' => $transaction->updated_at->format('Y-m-d'), // Format date as needed
+                        ];
+                    }
+                }
+    
+               // Loop through each ledger transaction associated with the reservation
+                foreach ($reservation->ledger->ledger_trans_list as $transaction) {
+    
+                    if ($transaction->payment_status === 'Paid') {
+                        // Extract the month and year from the transaction's updated_at timestamp
+                        $monthYear = Carbon::parse($transaction->updated_at)->format('F');
+    
+                        // Calculate the commission earned for this transaction
+                        $commissionPercent = $subAgent->sub_agent_com / 100;
+                        $commission = $transaction->monthly_payment * $commissionPercent;
+            
+                        // Add the commission to the total earnings for this month
+                        if (!isset($commissionPerMonth[$monthYear])) {
+                            $commissionPerMonth[$monthYear] = 0;
+                        }
+    
+                        $commissionPerMonth[$monthYear] += $commission;
+                    }
+                }
+
+
+            }
+        }
+        
+        //Agent
+        foreach ($propertyReservations as $reservation) {
             if($reservation->ledger->ledger_trans_list->isEmpty()){
                 if ($reservation->ledger->updated_at >= $startFirstPeriod && $reservation->ledger->updated_at <= $endFirstPeriod) {
                     // Calculate commission for the first period
@@ -223,9 +383,8 @@ class PropertyLedgerController extends Controller
                     // Calculate and add the commission to the total for the entire month
                     $commissionPercent = $reservation->agent_com / 100;
                     $commissionEntireMonth += $reservation->ledger->total_amount * $commissionPercent;
-                }
 
-               
+                }
 
                 // Extract the month and year from the transaction's updated_at timestamp
                 $monthYear = Carbon::parse($reservation->ledger->updated_at)->format('F');
@@ -233,6 +392,14 @@ class PropertyLedgerController extends Controller
                 // Calculate the commission earned for this transaction
                 $commissionPercent = $reservation->agent_com / 100;
                 $commission = $reservation->ledger->total_amount * $commissionPercent;
+
+                $commissionData[] = [
+                    'invoice' => $reservation->invoice_number,
+                    'total' => $reservation->ledger->total_amount * $commissionPercent,
+                    'commission' => intval($reservation->agent_com).'%', 
+                    'tag' => 'Agent',
+                    'date' => $transaction->updated_at->format('Y-m-d'), // Format date as needed
+                ];
     
                 // Add the commission to the total earnings for this month
                 if (!isset($commissionPerMonth[$monthYear])) {
@@ -251,6 +418,7 @@ class PropertyLedgerController extends Controller
                         // Calculate and add the commission to the total for the first period
                         $commissionPercent = $reservation->agent_com / 100;
                         $commissionFirstPeriod += $transaction->monthly_payment * $commissionPercent;
+
                     }
                 }
     
@@ -280,6 +448,15 @@ class PropertyLedgerController extends Controller
                         // Calculate and add the commission to the total for the entire month
                         $commissionPercent = $reservation->agent_com / 100;
                         $commissionTotal += $transaction->monthly_payment * $commissionPercent;
+
+                        $commissionData[] = [
+                            'invoice' => $reservation->invoice_number,
+                            'total' => $transaction->monthly_payment * $commissionPercent,
+                            'commission' => intval($reservation->agent_com).'%', 
+                            'tag' => 'Agent',
+                            'date' => $transaction->updated_at->format('Y-m-d'), // Format date as needed
+                        ];
+
                     }
                 }
     
@@ -293,6 +470,7 @@ class PropertyLedgerController extends Controller
                         // Calculate the commission earned for this transaction
                         $commissionPercent = $reservation->agent_com / 100;
                         $commission = $transaction->monthly_payment * $commissionPercent;
+
             
                         // Add the commission to the total earnings for this month
                         if (!isset($commissionPerMonth[$monthYear])) {
@@ -303,7 +481,6 @@ class PropertyLedgerController extends Controller
                     }
                 }
             }
-
         }
 
         // Format the commission earnings per month with two decimal places
@@ -326,7 +503,7 @@ class PropertyLedgerController extends Controller
             $commissionPerMonthArray[] = $formattedCommission;
         }
 
-       // dd($commissionPerMonthArray);
+        $user = User::find($currenUser);
 
         return Inertia::render('User/Commission',[
             'property' => $property,
@@ -335,6 +512,8 @@ class PropertyLedgerController extends Controller
             'entire_month' => $commissionEntireMonth,
             'total' => $commissionTotal,
             'graphData' => $commissionPerMonthArray,
+            'user' => $user,
+            'commissionData' => $commissionData,
         ]);
     }
 }

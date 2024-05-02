@@ -105,7 +105,7 @@
 </template>
 
 <script setup lang="ts">
-    import { Link, Head, useForm } from "@inertiajs/vue3";
+    import { Link, Head, useForm, router } from "@inertiajs/vue3";
     import Layout from "@/Layouts/main.vue";
     import PageHeader from "@/Components/page-header.vue";
     import { ref, onMounted, computed } from 'vue';
@@ -189,7 +189,7 @@
     
     const formatContactData = contacts => {
         return contacts.map(contact => [
-            contact.id,
+            contact.dec,
             contact.fname,
             contact.lname,
             contact.fname + ' ' + contact.lname,
@@ -199,6 +199,7 @@
             contact.other_details,
             formatCreatedAt(contact.created_at),
             props.roles == 'administrator' ? contact.roles[0].name : contact.roles[0],
+            props.roles,
         ]);
     };
 
@@ -250,19 +251,60 @@
                 id: 'createColumn', // Unique ID for the Address column
                 name: "Created Date"
             },
-            {name:'Role'},
+            {   id: 'roleColumn',
+                name:'Role',
+                align: 'center',
+                formatter: (cell, row) =>{
+                    const statusText = cell;
+                    let badge;
+
+                    if (cell == 'administrator') {
+                        badge = 'bg-danger';
+                    } else if (cell == 'client') {
+                        badge = 'bg-success';
+                    } else if (cell == 'agent') {
+                        badge = 'bg-info';
+                    } else {
+                        badge = 'bg-success';
+                    }
+
+                    return h('span', { className: 'badge ' + badge, onClick: () => editModal(row) }, [
+                        statusText
+                    ])
+                }
+            },
+            { name: 'Roles', hidden: true},
             {
                 id: 'actionsColumn',
                 name: 'Actions',
                 align: 'center',
                 width: '75px',
                 formatter: (cell, row) => {
-                    return  h('a', { href: 'javascript:void(0);', className: 'text-muted',  onClick: () => editModal(row) },[
-                        h('i', { className: 'ri-pencil-fill fs-16' }),
-                    ])
+                    const status = row.cells[9].data;
+                    const roles = row.cells[10].data;
+                    return h('ul', { className: 'list-inline hstack gap-2 mb-0' }, [
+                            h('li', { className: 'list-inline-item', 'data-bs-toggle': 'tooltip', 'data-bs-trigger': 'hover', 'data-bs-placement': 'top', title: 'Edit' }, [
+                                h('a', { href: 'javascript:void(0);', className: 'text-muted d-inline-block', onClick: () => editModal(row) }, [
+                                    h('i', { className: 'ri-pencil-fill fs-16' })
+                                ])
+                            ]),
+                        status == 'agent' ?
+                            h('li', { className: 'list-inline-item', 'data-bs-toggle': 'tooltip', 'data-bs-trigger': 'hover', 'data-bs-placement': 'top', title: 'View' }, [
+                                h('a', { href: 'javascript:void(0);', className: 'view-item-btn', onClick: () => showUrl(row) }, [
+                                    h('i', { className: 'ri-eye-line text-info' })
+                                ])
+                        ]) :  null,
+                        status == 'client' && roles == 'administrator' ?
+                            h('li', { className: 'list-inline-item', 'data-bs-toggle': 'tooltip', 'data-bs-trigger': 'hover', 'data-bs-placement': 'top', title: 'View' }, [
+                                h('a', { href: 'javascript:void(0);', className: 'view-item-btn', onClick: () => showUrlClient(row) }, [
+                                    h('i', { className: 'ri-eye-line text-info' })
+                                ])
+                        ]) :  null
+                    ]);
                 },
                 sort: false    
-        }],
+            }
+    ],
             sort: false,
             theme: 'mermaid',
             search: true,
@@ -273,7 +315,7 @@
                 return new Promise(function (resolve){
                     setTimeout(function(){
                         resolve(formattedData);
-                    },2000)
+                    },1000)
                 })
             },
         }).render(gridContainer.value);
@@ -355,6 +397,14 @@
                 form.reset();
             },
         });
+    }
+
+    const showUrl = (row) =>{
+        router.visit('/commission/' + row.cells[0].data + '/')
+    }
+
+    const showUrlClient = (row) =>{
+        router.visit('/my-property/' + row.cells[0].data + '/')
     }
 
     const deleteSelectedRows = () => {

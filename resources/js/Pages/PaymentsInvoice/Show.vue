@@ -1281,7 +1281,7 @@ const calculateResult = () => {
                 let begin = adjustedPrincipal;
                 for (let i = 0; i < terms; i++) {
                     const dueDate = new Date(currentDate);
-                    dueDate.setMonth(currentDate.getMonth() + i);
+                    dueDate.setMonth((currentDate.getMonth() + 1) + i);
                     const formattedDueDate = dueDate.toISOString().slice(0, 10);
                     const end = begin - montlyAmortization.value;
                     const data = {
@@ -1318,7 +1318,7 @@ const calculateResult = () => {
                 for (let i = 0; i < terms; i++) {
                     const payment = initialPayment * (1 - i / terms);
                     const dueDate = new Date(currentDate);
-                    dueDate.setMonth(currentDate.getMonth() + i);
+                    dueDate.setMonth((currentDate.getMonth() + 1) + i);
                     const formattedDueDate = dueDate.toISOString().slice(0, 10);
                     const end = begin - payment.toFixed(2);
                     const data = {

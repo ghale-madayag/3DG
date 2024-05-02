@@ -24,6 +24,7 @@ class PropertyReservation extends Model
         'pay_method',
         'reservation_fee',
         'status',
+        'date_due',
     ];
 
     public function client()

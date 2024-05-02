@@ -13,6 +13,7 @@ use App\Models\PropertyLedgerTransaction;
 use App\Models\PropertyReservation;
 use App\Models\SubAgentReservation;
 use App\Models\User;
+use Carbon\Carbon;
 use Dompdf\Dompdf;
 use Dompdf\Options;
 use Illuminate\Support\Facades\Storage;
@@ -34,6 +35,67 @@ class PaymentsInvoiceController extends Controller
      */
     public function index()
     {
+
+        $currentMonthStart = Carbon::now()->startOfMonth();
+        $currentMonthEnd = Carbon::now()->endOfMonth();
+
+        //Overdue
+        $overdueTransaction  = PropertyLedgerTransaction::where('due_date', '<', now())
+        ->where('payment_status', 'Unpaid')
+        ->get();
+
+        $overdueTransactionCount = $overdueTransaction->count();
+        $overdueTransactionTotalAmount = $overdueTransaction->sum('monthly_payment');
+
+        $overdueTransactionData = [
+            'count' => $overdueTransactionCount,
+            'total_amount' => $overdueTransactionTotalAmount,
+        ];
+        
+        //paid invoices
+        $paidInvoices  = PropertyLedgerTransaction::where('payment_status', 'Paid')
+            ->whereBetween('updated_at', [$currentMonthStart, $currentMonthEnd])
+            ->get();
+
+        $paidInvoicesBal  = PropertyLedgerTransaction::where('payment_status', 'Unpaid')
+            ->where('paid_amount','>', 0)
+            ->whereBetween('updated_at', [$currentMonthStart, $currentMonthEnd])
+            ->get();
+        
+        $paidInvoiceCount = $paidInvoices->count();
+        $paidInvoiceTotalAmount = ($paidInvoices->sum('monthly_payment') ?? 0) + ($paidInvoicesBal->sum('paid_amount') ?? 0);
+
+        $paidInvoiceData = [
+            'count' => $paidInvoiceCount,
+            'total_amount' => $paidInvoiceTotalAmount,
+        ];
+
+        $unpaidInvoices  = PropertyLedgerTransaction::where('payment_status', 'Unpaid')
+            ->whereBetween('due_date', [$currentMonthStart, $currentMonthEnd])
+            ->get();
+
+       
+        $unpaidInvoiceCount = $unpaidInvoices->count();
+        $unpaidInvoiceTotalAmount = $unpaidInvoices->sum('monthly_payment');
+
+        $unpaidInvoiceData = [
+            'count' => $unpaidInvoiceCount,
+            'total_amount' => $unpaidInvoiceTotalAmount,
+        ];
+
+        $resInvoice = PropertyReservation::whereNotIn('status', ['Pending', 'Overdue'])
+            ->whereBetween('created_at', [$currentMonthStart, $currentMonthEnd])
+            ->get();
+
+        $resInvoiceCount = $resInvoice->count();
+        $resInvoiceTotalAmount = $resInvoice->sum('reservation_fee');
+
+        $resInvoiceData = [
+            'count' => $resInvoiceCount,
+            'total_amount' => $resInvoiceTotalAmount,
+        ];
+
+        
         $property = PropertyReservation::with([
             'lot' => function ($query) {
                 $query->select('id','lot_number','lot_name','block_id');
@@ -51,6 +113,10 @@ class PaymentsInvoiceController extends Controller
         
         return Inertia::render('PaymentsInvoice/Index',[
             'property' => $property,
+            'overdue' => $overdueTransactionData,
+            'paid' => $paidInvoiceData,
+            'unpaid' => $unpaidInvoiceData,
+            'reservation' => $resInvoiceData,
         ]);
     }
 
@@ -123,11 +189,20 @@ class PaymentsInvoiceController extends Controller
     {
         $currentUser = Auth::user();
         $roles = $currentUser->getRoleNames()->toArray();
+
+        // Get the current date
+        $currentDate = Carbon::now();
+
+        // Calculate the date due by adding 15 days to the current date
+        $dateDue = $currentDate->addDays(15);
+
         try {
             //dd($request);
             $validatedData = $request->validate($this->getReservationValidationRules($request));
             $validatedData['invoice_number'] = $this->generateInvoiceNumber();
             $validatedData['status'] = $request->status ? $request->status : 'Reserved';
+             // Update the validated data array with the new date_due value
+            $validatedData['date_due'] = $dateDue;
             
             $reservation = PropertyReservation::create($validatedData);
             Lot::where('id',$validatedData['lot_id'])->update(['status' => $request->status ? $request->status : 'Reserved']);
@@ -160,13 +235,22 @@ class PaymentsInvoiceController extends Controller
     }
 
     public function updateInvoice(Request $request,PropertyReservation $paymentsInvoice){
+
+        // Get the current date
+        $currentDate = Carbon::now();
+
+        // Calculate the date due by adding 15 days to the current date
+        $dateDue = $currentDate->addDays(15);
+
         $validatedData = $request->validate($this->getReservationValidationRules($paymentsInvoice));   
         $validatedData['status'] = 'Reserved';
+        // Update the validated data array with the new date_due value
+        $validatedData['date_due'] = $dateDue;
 
         Lot::where('id',$validatedData['lot_id'])->update(['status' => $request->status ? $request->status : 'Reserved']);
 
         $paymentsInvoice->update($validatedData); 
-
+        
         $filteredSubAgentIds = array_filter($request->sub_agent_id, function($value) {
             return $value !== null;
         });
@@ -272,7 +356,7 @@ class PaymentsInvoiceController extends Controller
      */
     public function update(Request $request, PaymentsInvoice $paymentsInvoice)
     {   
-
+        
         $validatedData = $request->validate($this->getLedgerRules($paymentsInvoice));
        
         if($request->hasFile('pdf')) {

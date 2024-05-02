@@ -125,9 +125,9 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified',
     });
 
     Route::controller(PropertyLedgerController::class)->group(function(){
-        Route::get('/my-property', 'index');
+        Route::get('/my-property/{encryptedId}', 'index');
         Route::get('/my-ledger/{property}', 'show');
-        Route::get('/my-commission','commission');  
+        Route::get('/commission/{encryptedId}','commission');  
 
         Route::post('/my-ledger/{propertyLedger}/update', 'update');
     });
