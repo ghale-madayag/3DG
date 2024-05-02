@@ -16,10 +16,10 @@ return new class extends Migration
             $table->foreignId('lot_id')->constrained()->onDelete('cascade');
             $table->decimal('per_sqm_price', 10, 2)->nullable()->default(0);
             $table->decimal('total_price', 10, 2);
-            $table->foreignId('client_id')->constrained()->onDelete('cascade');
-            $table->foreignId('broker_id')->constrained()->onDelete('cascade');
+            $table->foreignId('client_id')->references('id')->on('users');
+            $table->foreignId('broker_id')->references('id')->on('users');
             $table->unsignedInteger('broker_com')->nullable()->default(0);
-            $table->foreignId('agent_id')->constrained()->onDelete('cascade');
+            $table->foreignId('agent_id')->references('id')->on('users');
             $table->unsignedInteger('agent_com')->nullable()->default(0);
             $table->string('pay_method');
             $table->decimal('reservation_fee', 10, 2);

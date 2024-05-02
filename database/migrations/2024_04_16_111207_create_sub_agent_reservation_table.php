@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('sub_agent_reservations', function (Blueprint $table) {
             $table->id();
             $table->string('property_reservation_id')->index();
-            $table->foreignId('sub_agent_id')->constrained()->onDelete('cascade');
+            $table->foreignId('sub_agent_id')->references('id')->on('users');
             $table->decimal('sub_agent_com', 5, 2);
             $table->timestamps();
 
