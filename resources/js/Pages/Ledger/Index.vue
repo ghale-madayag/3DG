@@ -1,10 +1,10 @@
 <template>
     <Layout>
 
-        <Head :title="roles != 'administrator' || roles != 'superadmin' ? 'My Ledger' : 'Ledger'">
+        <Head :title="roles != 'administrator' && roles != 'superadmin' ? 'My Ledger' : 'Ledger'">
             <meta name="viewport" content="your content" />
         </Head>
-        <PageHeader :title="roles != 'administrator' || roles != 'superadmin' ? 'My Ledger' : 'Ledger'" :pageTitle="roles != 'administrator' || roles != 'superadmin' ? 'My Property' : 'Payments & Invoice'" :url="roles != 'administrator' || roles != 'superadmin' ? '/my-property/' : '/payments-invoice/' " />
+        <PageHeader :title="roles != 'administrator' && roles != 'superadmin' ? 'My Ledger' : 'Ledger'" :pageTitle="roles != 'administrator' && roles != 'superadmin' ? 'My Property' : 'Payments & Invoice'" :url="roles != 'administrator' && roles != 'superadmin' ? '/my-property/' : '/payments-invoice/' " />
         <div class="row">
             <div class="col-xl-4">
                 <div class="sticky-side-div d-print-none">

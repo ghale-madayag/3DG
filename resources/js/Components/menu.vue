@@ -229,11 +229,11 @@ export default {
           <Link class="nav-link menu-link" href="/user" role="button" aria-expanded="false"
             aria-controls="sidebarDashboards">
           <i class="ri-user-2-fill"></i>
-          <span  v-if="$page.props.roles != 'administrator' || $page.props.roles != 'superadmin'"> Client</span>
+          <span  v-if="$page.props.roles != 'administrator' && $page.props.roles != 'superadmin'"> Client</span>
           <span  v-else> User</span>
           </Link>
         </li>
-        <li class="nav-item" v-if="$page.props.roles != 'administrator' || $page.props.roles != 'superadmin'">
+        <li class="nav-item" v-if="$page.props.roles != 'administrator' && $page.props.roles != 'superadmin'">
           <Link class="nav-link menu-link" :href="'/my-property/'+$page.props.decrypt" role="button" aria-expanded="false">
           <i class="ri-home-smile-line"></i>
           <span data-key="t-property"> {{ $t("t-my-property") }}</span>
