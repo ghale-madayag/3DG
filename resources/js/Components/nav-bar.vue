@@ -912,10 +912,10 @@ export default {
             <span class="align-middle"> Help</span>
             </Link> -->
             <div class="dropdown-divider"></div>
-            <Link class="dropdown-item" href="/pages/profile-setting">
+            <!-- <Link class="dropdown-item" href="/pages/profile-setting">
               <i class="mdi mdi-cog-outline text-muted fs-16 align-middle me-1"></i>
               <span class="align-middle"> Settings</span>
-            </Link>
+            </Link> -->
             <!-- <Link class="dropdown-item" href="/auth/lockscreen-basic"><i class="mdi mdi-lock text-muted fs-16 align-middle me-1"></i>
             <span class="align-middle"> Lock screen</span>
             </Link> -->

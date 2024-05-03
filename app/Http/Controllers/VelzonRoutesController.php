@@ -44,9 +44,23 @@ class VelzonRoutesController extends Controller
             ->whereBetween('created_at', [$currentMonthStart, $currentMonthEnd])
             ->get();
 
+        $fullInvoices = PropertyReservation::with('ledger')
+            ->where('status', 'Fullpayment')
+            ->whereBetween('created_at', [$currentMonthStart, $currentMonthEnd])
+            ->get();
+
+        $fulltotalAmount = 0;
+
+        foreach ($fullInvoices as $invoice) {
+            $fulltotalAmount += $invoice->ledger->total_amount;
+        }
+
 
         $paidInvoiceCount = $paidInvoices->count();
-        $paidInvoiceTotalAmount = ($paidInvoices->sum('monthly_payment') ?? 0) + ($paidInvoicesBal->sum('paid_amount') ?? 0) + ($resInvoice->sum('reservation_fee') ?? 0);
+        $paidInvoiceTotalAmount = ($paidInvoices->sum('monthly_payment') ?? 0) 
+            + ($paidInvoicesBal->sum('paid_amount') ?? 0) 
+            + ($resInvoice->sum('reservation_fee') ?? 0)
+            + ($fulltotalAmount ?? 0);
 
         $paidInvoiceData = [
             'count' => $paidInvoiceCount,
@@ -158,7 +172,7 @@ class VelzonRoutesController extends Controller
             $commissionPerMonthArray[] = $formattedCommission;
         }
 
-        if($roles[0] == 'administrator'){
+        if($roles[0] == 'administrator' || $roles[0] == 'superadmin'){
             return Inertia::render('dashboards/Index',[
                 'land' => $land,
                 'user' => $user,

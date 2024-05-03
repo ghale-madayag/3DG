@@ -580,7 +580,7 @@ class ProjectController extends Controller
         $roles = $currentUser->getRoleNames()->toArray();
         $clients = null;
 
-        if($roles[0] == 'administrator'){
+        if($roles[0] == 'administrator' ||  $roles[0] == 'superadmin'){
             $clients = User::
             orderBy('created_at', 'desc')
             ->get();

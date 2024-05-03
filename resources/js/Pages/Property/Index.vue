@@ -12,7 +12,7 @@
                             <input type="text" v-model="searchProject" class="form-control search" placeholder="Search..."> <i class="ri-search-line search-icon"></i>
                         </div>
                     </div>
-                    <div class="col-xl-2" v-if="roles=='administrator'">
+                    <div class="col-xl-2" v-if="roles=='administrator' || roles=='superadmin'">
                         <div class="hstack gap-2">
                             <Link class="btn btn-success" href="/project/create"><i class="ri-add-fill me-1 align-bottom"></i> Add Project</Link>
                         </div>

@@ -149,7 +149,7 @@ export default {
         <li class="menu-title">
           <span data-key="t-menu"> {{ $t("t-menu") }}</span>
         </li>
-        <div v-if="$page.props.roles == 'administrator'">
+        <div v-if="$page.props.roles == 'administrator' || $page.props.roles == 'superadmin'">
           <li class="nav-item">
             <Link class="nav-link menu-link" href="/" role="button" aria-expanded="false"
               aria-controls="sidebarDashboards">
@@ -213,7 +213,7 @@ export default {
             </div>
           </li>
         </div>
-        <li class="nav-item" v-if="$page.props.roles != 'administrator' && $page.props.roles !='client'">
+        <li class="nav-item" v-if="$page.props.roles != 'administrator' && $page.props.roles != 'superadmin' && $page.props.roles !='client'">
           <Link class="nav-link menu-link" :href="'/commission/'+$page.props.decrypt" role="button" aria-expanded="false">
           <i class="ri-dashboard-2-line"></i>
           <span data-key="t-dashboards"> {{ $t("t-dashboards") }}</span>
@@ -229,11 +229,11 @@ export default {
           <Link class="nav-link menu-link" href="/user" role="button" aria-expanded="false"
             aria-controls="sidebarDashboards">
           <i class="ri-user-2-fill"></i>
-          <span  v-if="$page.props.roles != 'administrator'"> Client</span>
+          <span  v-if="$page.props.roles != 'administrator' || $page.props.roles != 'superadmin'"> Client</span>
           <span  v-else> User</span>
           </Link>
         </li>
-        <li class="nav-item" v-if="$page.props.roles != 'administrator'">
+        <li class="nav-item" v-if="$page.props.roles != 'administrator' || $page.props.roles != 'superadmin'">
           <Link class="nav-link menu-link" :href="'/my-property/'+$page.props.decrypt" role="button" aria-expanded="false">
           <i class="ri-home-smile-line"></i>
           <span data-key="t-property"> {{ $t("t-my-property") }}</span>

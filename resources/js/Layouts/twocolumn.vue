@@ -323,7 +323,7 @@ export default {
                 <li class="menu-title">
                   <span data-key="t-menu"> {{ $t("t-menu") }}</span>
                 </li>
-              <div v-if="$page.props.roles == 'administrator'">
+              <div v-if="$page.props.roles == 'administrator' || $page.props.roles == 'superadmin'">
                   <li class="nav-item">
                     <Link class="nav-link menu-link" href="/" role="button"
                       aria-expanded="false" aria-controls="sidebarDashboards">

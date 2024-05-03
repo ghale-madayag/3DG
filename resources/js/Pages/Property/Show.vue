@@ -145,7 +145,7 @@
                                 </div>
                             </div>
                             <div class="col-xl-2">
-                                <div class="hstack gap-2" v-if="$page.props.roles=='administrator'">
+                                <div class="hstack gap-2" v-if="$page.props.roles=='administrator' || $page.props.roles=='superadmin'">
                                     <Link class="btn btn-success" :href="'/project/'+project.slug"><i class="ri-add-fill me-1 align-bottom"></i> Generate Lot</Link>
                                 </div>
                             </div>

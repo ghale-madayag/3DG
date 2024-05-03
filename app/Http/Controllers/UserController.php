@@ -30,23 +30,41 @@ class UserController extends Controller
         $currentUser = Auth::user();
 
         $roles = $currentUser->getRoleNames()->toArray();
-        $formattedData = null;
-        
-        if($roles[0] == 'administrator'){
-            $formattedData = User::with('agent_client')->where('id', '!=', $currentUser->id)
-                ->where('id', '!=', $currentUser->id)
-                ->orderBy('created_at', 'desc')->get()->map(function ($user) {
-                    $user->phone = $user->formatted_phone;
-                    $roles = $user->getRoleNames()->toArray();
-                    $user->roles = $roles;
-                    $user->dec = Crypt::encrypt($user->id);
-                    return $user;
-                });
+        $formattedData = User::with('agent_client')
+            ->where('id', '!=', $currentUser->id)
+            ->orderBy('created_at', 'desc');
+
+       
+        // Check if the user has a role of 'superadmin'
+        if ($roles[0] == 'superadmin') {
+            // No additional filtering needed for 'superadmin', display all users
+            $formattedData = $formattedData->where('id','!=',1)->get();
+
+            $formattedData = $formattedData->map(function ($user) {
+                $user->phone = $user->formatted_phone;
+                $roles = $user->getRoleNames()->toArray();
+                $user->roles = $roles;
+                $user->dec = Crypt::encrypt($user->id);
+                return $user;
+            });
+        } elseif ($roles[0] == 'administrator') {
+            // Additional filtering needed for 'administrator' to hide 'superadmin' users
+            $formattedData = $formattedData->whereDoesntHave('roles', function ($query) {
+                $query->where('name', 'superadmin');
+            })->get();
+            
+            $formattedData = $formattedData->map(function ($user) {
+                $user->phone = $user->formatted_phone;
+                $roles = $user->getRoleNames()->toArray();
+                $user->roles = $roles;
+                $user->dec = Crypt::encrypt($user->id);
+                return $user;
+            });
         }else{
             $users = $currentUser->agent_client()
-            ->with('user')
-            ->orderBy('created_at', 'desc')
-            ->get();
+                ->with('user')
+                ->orderBy('created_at', 'desc')
+                ->get();
 
             $formattedData = $users->map(function ($user) {
                 $roles = $user->user->getRoleNames()->toArray();
@@ -63,8 +81,50 @@ class UserController extends Controller
                 ];
             });
         }
+        
+        // if($roles[0] == 'superadmin'){
+        //     $formattedData = User::with('agent_client')
+        //         ->where('id', '!=', $currentUser->id)
+        //         ->orderBy('created_at', 'desc')->get()->map(function ($user) {
+        //             $user->phone = $user->formatted_phone;
+        //             $roles = $user->getRoleNames()->toArray();
+        //             $user->roles = $roles;
+        //             $user->dec = Crypt::encrypt($user->id);
+        //             return $user;
+        //         });
+        
+        // }else if($roles[0] == 'administrator'){
+        //     $formattedData = User::with('agent_client')
+        //         ->where('id', '!=', $currentUser->id)
+        //         ->orderBy('created_at', 'desc')->get()->map(function ($user) {
+        //             $user->phone = $user->formatted_phone;
+        //             $roles = $user->getRoleNames()->toArray();
+        //             $user->roles = $roles;
+        //             $user->dec = Crypt::encrypt($user->id);
+        //             return $user;
+        //         });
+        // }else{
+        //     $users = $currentUser->agent_client()
+        //     ->with('user')
+        //     ->orderBy('created_at', 'desc')
+        //     ->get();
 
-       // dd($formattedData);
+        //     $formattedData = $users->map(function ($user) {
+        //         $roles = $user->user->getRoleNames()->toArray();
+        //         return (object) [
+        //             'id' => $user->user->id,
+        //             'fname' => $user->user->fname,
+        //             'lname' => $user->user->lname,
+        //             'phone' => $user->user->phone,
+        //             'email' => $user->user->email,
+        //             'address' => $user->user->address,
+        //             'other_details' => $user->user->other_details,
+        //             'created_at' => $user->user->created_at,
+        //             'roles' => $roles,
+        //         ];
+        //     });
+        // }
+
 
         return Inertia::render('User/Index',[
             'contacts' => $formattedData,
@@ -93,6 +153,7 @@ class UserController extends Controller
 
     public function update(Request $request, User $user)
     {
+
 
         $validatedData = $request->validate($this->getValidationRules($user));   
         

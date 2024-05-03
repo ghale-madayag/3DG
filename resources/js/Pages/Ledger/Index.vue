@@ -1,10 +1,10 @@
 <template>
     <Layout>
 
-        <Head :title="roles != 'administrator' ? 'My Ledger' : 'Ledger'">
+        <Head :title="roles != 'administrator' || roles != 'superadmin' ? 'My Ledger' : 'Ledger'">
             <meta name="viewport" content="your content" />
         </Head>
-        <PageHeader :title="roles != 'administrator' ? 'My Ledger' : 'Ledger'" :pageTitle="roles != 'administrator' ? 'My Property' : 'Payments & Invoice'" :url="roles != 'administrator' ? '/my-property/' : '/payments-invoice/' " />
+        <PageHeader :title="roles != 'administrator' || roles != 'superadmin' ? 'My Ledger' : 'Ledger'" :pageTitle="roles != 'administrator' || roles != 'superadmin' ? 'My Property' : 'Payments & Invoice'" :url="roles != 'administrator' || roles != 'superadmin' ? '/my-property/' : '/payments-invoice/' " />
         <div class="row">
             <div class="col-xl-4">
                 <div class="sticky-side-div d-print-none">
@@ -18,7 +18,7 @@
                             </div>
                             <h6 class="mb-0 text-success text-uppercase">Balance from the last payment:</h6>
                         </div>
-                        <div class="card-header bg-light-subtle border-bottom-dashed" v-if="roles == 'administrator' && next_due != null">
+                        <div class="card-header bg-light-subtle border-bottom-dashed" v-if="roles == 'administrator' || roles == 'superadmin' && next_due != null">
                             <AlertMsg v-if="msg" class="col-md-12" :type="'success'" :msg="message" />
                             <AlertMsg v-if="form.errors.amount" class="col-md-12" :type="'danger'" :msg="form.errors.amount" />
                             <div class="hstack gap-3 px-3 mx-n3">

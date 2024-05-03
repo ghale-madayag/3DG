@@ -3,7 +3,7 @@
         <Head title="User List">
             <meta name="viewport" content="your content" />
         </Head>
-        <PageHeader :title="roles == 'administrator' ? 'User': 'Client'" :pageTitle="roles == 'administrator' ? 'Dashboard' : 'Client'" />
+        <PageHeader :title="roles == 'administrator' || roles == 'superadmin' ? 'User': 'Client'" :pageTitle="roles == 'administrator' || roles == 'superadmin'  ? 'Dashboard' : 'Client'" />
         <div class="row">
             <div class="col-lg-12">
                 <div class="card">
@@ -12,7 +12,7 @@
                         <div class="row g-4 align-items-center">
                             <div class="col-sm">
                                 <div>
-                                    <h5 class="card-title mb-0" v-html="roles == 'administrator' ? 'User list' : 'Client List'"></h5>
+                                    <h5 class="card-title mb-0" v-html="roles == 'administrator' || roles == 'superadmin'  ? 'User list' : 'Client List'"></h5>
                                 </div>
                             </div>
                             <div class="col-sm-auto">
@@ -69,15 +69,16 @@
                                 <textarea class="form-control" v-model="form.other_details" :class="{ 'is-invalid': form.errors.other_details }" id="other_details" rows="3"></textarea>
                                 <div class="invalid-feedback">{{ form.errors.other_details  }}</div>
                             </div>
-                            <div v-if="roles == 'administrator'">
+                            <div v-if="roles == 'administrator' || roles == 'superadmin'">
                                 <label for="role">Select Role</label>
                                 <select class="form-select mb-3" v-model="form.roles" aria-label="Default select example">
                                     <option selected disabled>Select Role</option>
-                                    <option value="contact">Contact Person</option>
+                                    <!-- <option value="contact">Contact Person</option> -->
                                     <option value="client">Client</option>
                                     <option value="agent">Agent</option>
-                                    <option value="staff">Staff</option>
-                                    <option value="administrator">Administrator</option>
+                                    <!-- <option value="staff">Staff</option> -->
+                                    <option v-if="roles=='superadmin'" value="administrator">Administrator</option>
+                                    <option v-if="roles=='superadmin'" value="superadmin">Super Admin</option>
                                 </select>
                             </div>
                             <div v-else>
@@ -189,7 +190,7 @@
     
     const formatContactData = contacts => {
         return contacts.map(contact => [
-            contact.dec,
+            contact.id,
             contact.fname,
             contact.lname,
             contact.fname + ' ' + contact.lname,
@@ -198,8 +199,9 @@
             contact.address,
             contact.other_details,
             formatCreatedAt(contact.created_at),
-            props.roles == 'administrator' ? contact.roles[0].name : contact.roles[0],
+            props.roles == 'administrator' || props.roles == 'superadmin' ? contact.roles[0].name : contact.roles[0],
             props.roles,
+            contact.dec,
         ]);
     };
 
@@ -207,6 +209,7 @@
     onMounted(() => {
 
         const formattedData = formatContactData(props.contacts)
+       
         grid = new Grid({
             columns: [{
                 id: 'checkboxCol',
@@ -258,7 +261,7 @@
                     const statusText = cell;
                     let badge;
 
-                    if (cell == 'administrator') {
+                    if (cell == 'administrator' || cell == 'superadmin') {
                         badge = 'bg-danger';
                     } else if (cell == 'client') {
                         badge = 'bg-success';
@@ -294,7 +297,7 @@
                                     h('i', { className: 'ri-eye-line text-info' })
                                 ])
                         ]) :  null,
-                        status == 'client' && roles == 'administrator' ?
+                        status == 'client' && (roles == 'administrator' || roles == 'superadmin') ?
                             h('li', { className: 'list-inline-item', 'data-bs-toggle': 'tooltip', 'data-bs-trigger': 'hover', 'data-bs-placement': 'top', title: 'View' }, [
                                 h('a', { href: 'javascript:void(0);', className: 'view-item-btn', onClick: () => showUrlClient(row) }, [
                                     h('i', { className: 'ri-eye-line text-info' })
@@ -400,11 +403,12 @@
     }
 
     const showUrl = (row) =>{
-        router.visit('/commission/' + row.cells[0].data + '/')
+        console.log(row);
+        router.visit('/commission/' + row.cells[11].data + '/')
     }
 
     const showUrlClient = (row) =>{
-        router.visit('/my-property/' + row.cells[0].data + '/')
+        router.visit('/my-property/' + row.cells[11].data + '/')
     }
 
     const deleteSelectedRows = () => {

@@ -61,9 +61,21 @@ class PaymentsInvoiceController extends Controller
             ->where('paid_amount','>', 0)
             ->whereBetween('updated_at', [$currentMonthStart, $currentMonthEnd])
             ->get();
+
+        $fullInvoices = PropertyReservation::with('ledger')
+            ->where('status', 'Fullpayment')
+            ->whereBetween('created_at', [$currentMonthStart, $currentMonthEnd])
+            ->get();
+
+        $fulltotalAmount = 0;
+
+        foreach ($fullInvoices as $invoice) {
+            $fulltotalAmount += $invoice->ledger->total_amount;
+        }
+
         
         $paidInvoiceCount = $paidInvoices->count();
-        $paidInvoiceTotalAmount = ($paidInvoices->sum('monthly_payment') ?? 0) + ($paidInvoicesBal->sum('paid_amount') ?? 0);
+        $paidInvoiceTotalAmount = ($paidInvoices->sum('monthly_payment') ?? 0) + ($paidInvoicesBal->sum('paid_amount') ?? 0) + ($fulltotalAmount ?? 0);
 
         $paidInvoiceData = [
             'count' => $paidInvoiceCount,
@@ -224,7 +236,7 @@ class PaymentsInvoiceController extends Controller
                 SubAgentReservation::insert($subAgentReservations);
             }
             
-            if($roles[0] == 'administrator'){
+            if($roles[0] == 'administrator' || $roles[0] == 'superadmin'){
                 return Redirect::to('/payments-invoice')->with('message', 'Reservation has been created successfully.');
             }else{
                 return Redirect::back()->with('message', 'Reservation has been created successfully. Please wait for approval');
