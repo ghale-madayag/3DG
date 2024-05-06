@@ -517,6 +517,7 @@
                                                                 <select class="form-select mb-3" v-model="formLotDetails.category" :class="{'is-invalid': formLotDetails.errors.category }">
                                                                     <option value="Inner Lot">Inner Lot</option>
                                                                     <option value="Corner Lot">Corner Lot</option>
+                                                                    <option value="Corner Lot">Prime Lot</option>
                                                                 </select>
                                                                 <div class="invalid-feedback">{{ formLotDetails.errors.category }}</div>
                                                             </div>

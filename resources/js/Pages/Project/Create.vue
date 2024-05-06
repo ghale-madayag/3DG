@@ -76,7 +76,7 @@
                             />
                         </div>
                         <div class="form-group col-lg-4">
-                            <label class="form-label">Total Units</label>
+                            <label class="form-label">Total Units (Lots)</label>
                             <input v-model="form.total_units" type="number" class="form-control">
                         </div>
                     </div>
