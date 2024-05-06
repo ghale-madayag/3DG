@@ -518,7 +518,7 @@ class ProjectController extends Controller
         }
     
         // Successfully processed the data
-        return redirect()->back();
+        return Redirect::back();
         
     }
 
