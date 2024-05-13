@@ -168,21 +168,22 @@
                                 <div class="card-body">
                                     <div class="table-responsive table-card">
                                         <div data-simplebar="init" style="max-height: 400px;" class="simplebar-scrollable-y"><div class="simplebar-wrapper" style="margin: 0px;"><div class="simplebar-height-auto-observer-wrapper"><div class="simplebar-height-auto-observer"></div></div><div class="simplebar-mask"><div class="simplebar-offset" style="right: 0px; bottom: 0px;"><div class="simplebar-content-wrapper" tabindex="0" role="region" aria-label="scrollable content" style="height: auto; overflow: hidden scroll;"><div class="simplebar-content" style="padding: 0px;">
-                                            <ul class="list-group list-group-flush">
-                                                <!-- <li class="list-group-item list-group-item-action">
-                                                    <div class="d-flex align-items-center">
-                                                        <img src="assets/images/users/avatar-10.jpg" alt="" class="avatar-xs object-fit-cover rounded-circle">
+                                            <ul class="list-group list-group-flush" v-for="(audit, index) in audits">
+                                                <li class="list-group-item list-group-item-action">
+                                                    <div class="d-flex align-items-center">                                        
+                                                        <img v-if="!audit.user.profile_photo_path" class="rounded-circle header-profile-user" :src="audit.user.profile_photo_url" :alt="audit.user.name">
+                                                        
                                                         <div class="ms-3 flex-grow-1">
                                                             <a href="#!" class="stretched-link">
-                                                                <h6 class="fs-14 mb-1">Herbert Stokes</h6>
+                                                                <h6 class="fs-14 mb-1">{{ audit.user.name }}</h6>
                                                             </a>
-                                                            <p class="mb-0 text-muted">@herbert10</p>
+                                                            <p class="mb-0 text-muted text-capitalize">{{ audit.event }} {{ formatType(audit.auditable_type) }}</p>
                                                         </div>
                                                         <div>
-                                                            <h6>174.36 ETH</h6>
+                                                            <h6>{{ formatCreatedAt(audit.created_at) }}</h6>
                                                         </div>
                                                     </div>
-                                                </li> -->
+                                                </li>
                                             </ul>
                                         </div></div></div></div><div class="simplebar-placeholder" style="width: 1101px; height: 455px;"></div></div><div class="simplebar-track simplebar-horizontal" style="visibility: hidden;"><div class="simplebar-scrollbar" style="width: 0px; display: none;"></div></div><div class="simplebar-track simplebar-vertical" style="visibility: visible;"><div class="simplebar-scrollbar" style="height: 269px; transform: translate3d(0px, 0px, 0px); display: block;"></div></div></div>
                                     </div>
@@ -212,6 +213,7 @@ let props = defineProps({
     sold: Number,
     available: Number,
     graphData: Array,
+    audits: Object,
 })
 
 const getGreeting = () => {
@@ -237,6 +239,32 @@ const formatNumber = (number) => {
         ? formattedNumber.replace(/\.\d+$/, "")
         : formattedNumber;
 };
+
+const formatCreatedAt = (dateString) => {
+        const date = new Date(dateString);
+        const options = { 
+            month: 'long', 
+            day: 'numeric', 
+            year: 'numeric', 
+            hour: 'numeric', 
+            minute: 'numeric',
+            hour12: true
+        };
+        return date.toLocaleDateString('en-US', options);
+    }
+
+const formatType = (type) => {
+    console.log(type);
+    const val = type.replace('App\\Models\\', '');
+    let newVal = '';
+    if(val=='LandDevelopment'){
+        newVal = 'Land';
+    }else{
+        newVal = val;
+    }
+
+    return newVal;
+}
 
 const options = ref({
     chart: {

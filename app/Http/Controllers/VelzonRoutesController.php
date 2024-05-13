@@ -14,6 +14,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
 use Inertia\Inertia;
+use OwenIt\Auditing\Models\Audit;
 
 class VelzonRoutesController extends Controller
 {
@@ -172,6 +173,9 @@ class VelzonRoutesController extends Controller
             $commissionPerMonthArray[] = $formattedCommission;
         }
 
+        //get all audit
+        $audits = Audit::with('user')->latest()->get();
+
         if($roles[0] == 'administrator' || $roles[0] == 'superadmin'){
             return Inertia::render('dashboards/Index',[
                 'land' => $land,
@@ -181,6 +185,7 @@ class VelzonRoutesController extends Controller
                 'sold' => $sold,
                 'available' => $available,
                 'graphData' => $commissionPerMonthArray,
+                'audits' => $audits,
             ]);
         }else if($roles[0] == 'agent'){
 
