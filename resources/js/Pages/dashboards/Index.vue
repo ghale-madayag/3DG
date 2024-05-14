@@ -160,10 +160,10 @@
                         <div class="col-xxl-4">
                             <div class="card">
                                 <div class="card-header d-flex align-items-center">
-                                    <h6 class="card-title mb-0 flex-grow-1">Transaction History</h6>
-                                    <a class="text-muted" href="javascript:void(0);">
+                                    <h6 class="card-title mb-0 flex-grow-1">Login History</h6>
+                                    <!-- <a class="text-muted" href="javascript:void(0);">
                                         See All <i class="ri-arrow-right-line align-bottom"></i>
-                                    </a>
+                                    </a> -->
                                 </div>
                                 <div class="card-body">
                                     <div class="table-responsive table-card">
@@ -177,7 +177,7 @@
                                                             <a href="#!" class="stretched-link">
                                                                 <h6 class="fs-14 mb-1">{{ audit.user.name }}</h6>
                                                             </a>
-                                                            <p class="mb-0 text-muted text-capitalize">{{ audit.event }} {{ formatType(audit.auditable_type) }}</p>
+                                                            <p class="mb-0 text-muted text-capitalize">{{ formatSession(audit.event) }} {{ formatType(audit.auditable_type) }}</p>
                                                         </div>
                                                         <div>
                                                             <h6>{{ formatCreatedAt(audit.created_at) }}</h6>
@@ -254,7 +254,6 @@ const formatCreatedAt = (dateString) => {
     }
 
 const formatType = (type) => {
-    console.log(type);
     const val = type.replace('App\\Models\\', '');
     let newVal = '';
     if(val=='LandDevelopment'){
@@ -264,6 +263,15 @@ const formatType = (type) => {
     }
 
     return newVal;
+}
+
+const formatSession = (type) => {
+    console.log(type);
+    if(type == 'updated'){
+        return 'Logged out';
+    }else{
+        return 'Logged in';
+    }
 }
 
 const options = ref({

@@ -174,7 +174,13 @@ class VelzonRoutesController extends Controller
         }
 
         //get all audit
-        $audits = Audit::with('user')->latest()->get();
+        //$audits = Audit::with('user')->latest()->get();
+
+        $loginAudits = Audit::with('user')
+        ->latest()
+        ->get();
+
+        //dd($loginAudits);
 
         if($roles[0] == 'administrator' || $roles[0] == 'superadmin'){
             return Inertia::render('dashboards/Index',[
@@ -185,7 +191,7 @@ class VelzonRoutesController extends Controller
                 'sold' => $sold,
                 'available' => $available,
                 'graphData' => $commissionPerMonthArray,
-                'audits' => $audits,
+                'audits' => $loginAudits,
             ]);
         }else if($roles[0] == 'agent'){
 

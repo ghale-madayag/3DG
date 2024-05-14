@@ -4,12 +4,10 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use OwenIt\Auditing\Contracts\Auditable;
 
-class PropertyLedger extends Model implements Auditable
+class PropertyLedger extends Model
 {
     use HasFactory;
-    use \OwenIt\Auditing\Auditable;
     
     protected $fillable = [
         'invoice_number',

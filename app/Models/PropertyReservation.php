@@ -4,12 +4,10 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use OwenIt\Auditing\Contracts\Auditable;
 
-class PropertyReservation extends Model implements Auditable
+class PropertyReservation extends Model
 {
     use HasFactory;
-    use \OwenIt\Auditing\Auditable;
     protected $primaryKey = 'invoice_number';
     public $incrementing = false;
 
