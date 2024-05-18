@@ -85,13 +85,7 @@
                                                         @input="formatInput" />
                                                     <div class="invalid-feedback">The downpayment is required</div>
                                                 </div>
-                                                <div class="col-md-2">
-                                                    <label class="form-label">Term (Months)</label>
-                                                    <input type="text" v-model="form.terms"
-                                                        class="form-control form-control-lg" placeholder="Enter Months"
-                                                        :class="{ 'is-invalid': form.errors.terms }" v-mask="'###'" />
-                                                    <div class="invalid-feedback">The terms is required</div>
-                                                </div>
+                                               
                                                 <div class="col-md-2">
                                                     <label class="form-label">Discount(%)</label>
                                                     <div class="input-group">
@@ -115,18 +109,24 @@
                                                             @input="calculateResult" />
                                                     </div>
                                                 </div>
-                                                <!-- <div class="col-md-2">
-                                                    <label class="form-label">Interest rate(%)</label>
-                                                    <div class="input-group">
-                                                        <div class="input-group-text">
-                                                            %
-                                                        </div>
-                                                        <input type="number" v-model="form.interest
-                                                            " class="form-control form-control-lg"
-                                                            placeholder="Interest" />
+                                            </div>
+                                            <div class="row mt-4">
+                                                <div class="col-lg-3">
+                                                    <div class="mb-3 mb-lg-0">
+                                                        <label for="start_date" class="form-label">Start Date</label>
+                                                        <flatPickr v-model="form.start_date " class="form-control form-control-lg" :config="flatpickrOptions"></flatPickr>
                                                     </div>
-                                                </div> -->
-                                                <div class="mt-4">
+                                                </div>
+                                                <div class="col-md-2">
+                                                    <label class="form-label">Term (Months)</label>
+                                                    <input type="text" v-model="form.terms"
+                                                        class="form-control form-control-lg" placeholder="Enter Months"
+                                                        :class="{ 'is-invalid': form.errors.terms }" v-mask="'###'" />
+                                                    <div class="invalid-feedback">The terms is required</div>
+                                                </div>
+                                            </div>
+                                            <div class="row mt-4">
+                                                <div class="mt-0">
                                                     <h5 class="fs-14 mb-3">
                                                         Payment Plan
                                                     </h5>
@@ -172,7 +172,7 @@
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <div class="col-md-2 pt-2">
+                                                <div class="col-md-2 pt-4">
                                                     <button type="button" @click="calculateResult"
                                                         class="btn btn-success waves-effect waves-light">
                                                         <i class="ri-calculator-line align-bottom me-1"></i>
@@ -1036,7 +1036,7 @@ import AlertMsg from '../../Components/AlertMsg.vue';
 import {
     mask
 } from 'vue-the-mask';
-
+import flatPickr from "vue-flatpickr-component";
 import html2pdf from "html2pdf.js";
 import { email } from "@vuelidate/validators";
 
@@ -1092,6 +1092,7 @@ let form = useForm({
     total_amount: null,
     email: props.property.client.email,
     ledger: null,
+    start_date: null,
 });
 
 let formFP = useForm({
@@ -1280,8 +1281,8 @@ const calculateResult = () => {
                 montlyAmortization.value = adjustedPrincipal / terms;
                 let begin = adjustedPrincipal;
                 for (let i = 0; i < terms; i++) {
-                    const dueDate = new Date(currentDate);
-                    dueDate.setMonth((currentDate.getMonth() + 1) + i);
+                    const dueDate = new Date(form.start_date);
+                    dueDate.setMonth((dueDate.getMonth() + 1) + i);
                     const formattedDueDate = dueDate.toISOString().slice(0, 10);
                     const end = begin - montlyAmortization.value;
                     const data = {
@@ -1385,6 +1386,12 @@ const publish = () => {
     });
 
 };
+
+const flatpickrOptions = {
+        altInput: true,
+        altFormat: "F j, Y",
+        dateFormat: "Y-m-d",
+    };
 
 </script>
 

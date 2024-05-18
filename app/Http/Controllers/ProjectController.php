@@ -23,6 +23,7 @@ use Illuminate\Support\Facades\Redirect;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Auth;
+use Laravel\Jetstream\Agent;
 
 class ProjectController extends Controller
 {
@@ -588,12 +589,32 @@ class ProjectController extends Controller
 
 
         }else{
-            $clients = $currentUser->agent_client()
-            ->with('user')
+            // $clients = $currentUser->agent_client()
+            // ->with('user')
+            // ->orderBy('created_at', 'desc')
+            // ->get();
+
+            $clients = AgentClient::with('user')
             ->orderBy('created_at', 'desc')
             ->get();
 
-            $clientDetails = $this->generateContactDetails($clients);
+            $usersCollection = $clients->map(function ($client) {
+                return $client->user;
+            })->filter();
+
+            $clientDetails = $clients->map(function ($client) {
+                if ($client->user) {
+                    return [
+                        'value' => $client->user->id,
+                        'label' => $client->user->fname . ' ' . $client->user->lname,
+                    ];
+                }
+                return null;
+            })->filter(); // This will remove all null values from the collection.
+
+            //dd($usersCollection);
+
+            //$clientDetails = $this->generateAgentDetails($usersCollection);
         }
 
         //agent
