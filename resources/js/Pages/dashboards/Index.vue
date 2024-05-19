@@ -172,7 +172,7 @@
                                                 <li class="list-group-item list-group-item-action">
                                                     <div class="d-flex align-items-center">                                        
                                                         <img v-if="!audit.user.profile_photo_path" class="rounded-circle header-profile-user" :src="audit.user.profile_photo_url" :alt="audit.user.name">
-                                                        
+                                                        <img v-else="audit.user.profile_photo_path" class="rounded-circle header-profile-user" :src="audit.user.profile_photo_url" :alt="audit.user.name">
                                                         <div class="ms-3 flex-grow-1">
                                                             <a href="#!" class="stretched-link">
                                                                 <h6 class="fs-14 mb-1">{{ audit.user.name }}</h6>
@@ -266,7 +266,6 @@ const formatType = (type) => {
 }
 
 const formatSession = (type) => {
-    console.log(type);
     if(type == 'updated'){
         return 'Logged out';
     }else{

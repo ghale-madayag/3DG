@@ -119,7 +119,7 @@
                     formatter: (cell, row) => {
                         return h('ul', { className: 'list-inline hstack gap-2 mb-0' }, [
                             h('li', { className: 'list-inline-item', 'data-bs-toggle': 'tooltip', 'data-bs-trigger': 'hover', 'data-bs-placement': 'top', title: 'View' }, [
-                                h('a', { href: '#', className: 'text-info d-inline-block', onClick:() => showURL(row) }, [
+                                h('a', { href: '#', className: 'text-info d-inline-block', onClick:() => showURL(cell) }, [
                                     h('i', { className: 'ri-eye-fill fs-16' })
                                 ])
                             ]),
@@ -172,8 +172,8 @@
         });
     };
 
-    const showURL = (row) => {
-        router.visit('/project/'+row.cells[6].data+'/')
+    const showURL = (cell) => {
+       router.visit('/project/'+cell+'/')
     }
 
     const editUrl = (row) => {
@@ -190,4 +190,4 @@
 .gridjs-footer {
     border: 0 !important;
 }
-</style>
+</style>0
