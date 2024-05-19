@@ -173,11 +173,11 @@
     };
 
     const showURL = (cell) => {
-       router.visit('/project/'+cell+'/')
+       router.visit('/project/'+cell+'/', { preserveScroll: true })
     }
 
     const editUrl = (row) => {
-        router.visit('/project/'+row.cells[6].data+'/edit')
+        router.visit('/project/'+row.cells[6].data+'/edit', { preserveScroll: true })
     }
 
 </script>
