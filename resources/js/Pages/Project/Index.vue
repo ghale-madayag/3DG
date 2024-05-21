@@ -173,7 +173,8 @@
     };
 
     const showURL = (cell) => {
-       router.visit('../../project/'+cell+'/')
+       //router.visit('/project/'+cell+'/')
+       window.location.href = '/project/'+cell
     }
 
     const editUrl = (row) => {
