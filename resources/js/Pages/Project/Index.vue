@@ -173,7 +173,7 @@
     };
 
     const showURL = (cell) => {
-       router.get('/project/'+cell+'/', { preserveScroll: true })
+       router.get('https://app.3dgrealtydevelopment.com/project/'+cell+'/', { preserveScroll: true })
     }
 
     const editUrl = (row) => {
