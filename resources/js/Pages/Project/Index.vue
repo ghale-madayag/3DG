@@ -173,7 +173,8 @@
     };
 
     const showURL = (cell) => {
-       router.get('/project/'+cell+'/')
+       console.log(cell) 
+       router.visit('/project/'+cell+'/')
     }
 
     const editUrl = (row) => {
