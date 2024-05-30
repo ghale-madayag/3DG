@@ -169,7 +169,7 @@
                                             <p class="text-muted mb-2 text-uppercase fw-semibold">
                                                 Payment Plan</p>
                                             <h5 id="payment-status" class="fs-14 mb-0">
-                                                {{ property.ledger.plan }}
+                                                <span class="text-uppercase">{{ property.ledger.time_frame }} : {{ property.ledger.plan }}</span>
                                             </h5>
                                         </div>
                                         <div class="col-lg-3 col-6">
@@ -285,7 +285,7 @@
                                                     Beginning Balance
                                                 </th>
                                                 <th scope="col">
-                                                    Monthly Payment
+                                                    Payment
                                                 </th>
                                                 <th scope="col" class="text-end">
                                                     Ending Balance

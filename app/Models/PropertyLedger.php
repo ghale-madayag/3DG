@@ -16,6 +16,7 @@ class PropertyLedger extends Model
         'discount',
         'tax',
         'interest',
+        'time_frame',
         'plan',
         'total_amount',
         'pdf',

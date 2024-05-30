@@ -478,6 +478,7 @@ class PaymentsInvoiceController extends Controller
             'tax' => ['nullable', 'numeric', 'min:0'],
             'interest' => ['nullable', 'numeric', 'min:0'],
             'plan' => ['required'],
+            'time_frame' => ['required'],
             'total_amount' => ['required', 'numeric', 'min:0'],
             'pdf' => ['required'],
             'email' => ['required'],

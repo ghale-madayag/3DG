@@ -112,6 +112,15 @@
                                             </div>
                                             <div class="row mt-4">
                                                 <div class="col-lg-3">
+                                                    <label for="time_frame" class="form-label">Time Frame</label>
+                                                    <select class="form-select form-select-lg mb-3" v-model="form.time_frame">
+                                                        <option value="monthly">Monthly</option>
+                                                        <option value="quarterly">Quarterly</option>
+                                                        <option value="semi-annual">Semi-Annual</option>
+                                                        <option value="annual">Annual</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-lg-3">
                                                     <div class="mb-3 mb-lg-0">
                                                         <label for="start_date" class="form-label">Start Date</label>
                                                         <flatPickr v-model="form.start_date " class="form-control form-control-lg" :config="flatpickrOptions"></flatPickr>
@@ -307,7 +316,7 @@
                                                                 Beginning Balance
                                                             </th>
                                                             <th scope="col">
-                                                                Monthly Payment
+                                                                Payment
                                                             </th>
                                                             <th scope="col" class="text-end">
                                                                 Ending Balance
@@ -532,7 +541,7 @@
                                                                             class="text-muted mb-2 text-uppercase fw-semibold">
                                                                             Payment Plan</p>
                                                                         <h5 id="payment-status" class="fs-14 mb-0">
-                                                                            {{ form.plan }}
+                                                                            <span class="text-uppercase">{{ form.time_frame }} : {{ form.plan }}</span>
                                                                         </h5>
                                                                     </div>
                                                                     <!--end col-->
@@ -616,7 +625,7 @@
                                                                                     Beginning Balance
                                                                                 </th>
                                                                                 <th scope="col">
-                                                                                    Monthly Payment
+                                                                                    Payment
                                                                                 </th>
                                                                                 <th scope="col" class="text-end">
                                                                                     Ending Balance
@@ -1093,6 +1102,7 @@ let form = useForm({
     email: props.property.client.email,
     ledger: null,
     start_date: null,
+    time_frame: 'monthly',
 });
 
 let formFP = useForm({
@@ -1235,12 +1245,25 @@ const calculateFP = () => {
 
 
 };
+
+const terms = computed(() => {
+    if (form.time_frame === 'annual') {
+        return form.terms / 12;
+    } else if (form.time_frame === 'semi-annual') {
+        return form.terms / 6;
+    } else if (form.time_frame === 'quarterly') {
+        return form.terms / 3;
+    } else {
+        return form.terms; // Monthly by default
+    }
+});
+
 const calculateResult = () => {
     showSummaryFP.value = false;
     ledgerData.value = [];
     const principal = form.price;
     const interest = form.interest;
-    const terms = form.terms;
+    //const terms = form.terms;
     const tax = form.tax;
     const downpayment = form.downpayment;
     const discount = form.discount;
@@ -1278,11 +1301,30 @@ const calculateResult = () => {
         totalRes.value = adjustedPrincipal;
         if (form.plan === "Fixed") {
             if (interest === 0) {
-                montlyAmortization.value = adjustedPrincipal / terms;
                 let begin = adjustedPrincipal;
-                for (let i = 0; i < terms; i++) {
+                let time_frame = form.time_frame;
+                // let formattedTerms;
+
+                // if(time_frame == 'annual'){
+                //     formattedTerms = terms/12;
+                // }else{
+                //     formattedTerms = terms;
+                // }
+                montlyAmortization.value = adjustedPrincipal / terms.value;
+
+                for (let i = 0; i < terms.value; i++) {
                     const dueDate = new Date(form.start_date);
-                    dueDate.setMonth((dueDate.getMonth() + 1) + i);
+
+                    if(time_frame == 'annual'){
+                        dueDate.setFullYear(dueDate.getFullYear() + i);
+                    } else if (time_frame === 'semi-annual') {
+                        dueDate.setMonth(dueDate.getMonth() + 6 * i);
+                    } else if (time_frame === 'quarterly') {
+                        dueDate.setMonth(dueDate.getMonth() + 3 * i);
+                    }else{
+                        dueDate.setMonth((dueDate.getMonth() + 1) + i);
+                    }
+
                     const formattedDueDate = dueDate.toISOString().slice(0, 10);
                     const end = begin - montlyAmortization.value;
                     const data = {
@@ -1295,6 +1337,7 @@ const calculateResult = () => {
                     ledgerData.value.push(data);
                     begin = end;
                 }
+                
             } else {
                 const annualInterestRate = interest / 100;
                 const monthlyInterestRate = annualInterestRate / 12;
@@ -1311,15 +1354,28 @@ const calculateResult = () => {
                 const payments = [];
                 let sum = 0;
                 let begin = adjustedPrincipal;
-                for (let i = 1; i <= terms; i++) {
-                    sum += i / terms;
+
+                let time_frame = form.time_frame;
+
+                for (let i = 1; i <= terms.value; i++) {
+                    sum += i / terms.value;
                 }
                 const initialPayment = adjustedPrincipal / sum;
                 started.value = initialPayment;
-                for (let i = 0; i < terms; i++) {
-                    const payment = initialPayment * (1 - i / terms);
-                    const dueDate = new Date(currentDate);
-                    dueDate.setMonth((currentDate.getMonth() + 1) + i);
+                for (let i = 0; i < terms.value; i++) {
+                    const payment = initialPayment * (1 - i / terms.value);
+                    const dueDate = new Date(form.start_date);
+                  
+                    if(time_frame == 'annual'){
+                        dueDate.setFullYear(dueDate.getFullYear() + i);
+                    } else if (time_frame === 'semi-annual') {
+                        dueDate.setMonth(dueDate.getMonth() + 6 * i);
+                    } else if (time_frame === 'quarterly') {
+                        dueDate.setMonth(dueDate.getMonth() + 3 * i);
+                    }else{
+                        dueDate.setMonth((dueDate.getMonth() + 1) + i);
+                    }
+
                     const formattedDueDate = dueDate.toISOString().slice(0, 10);
                     const end = begin - payment.toFixed(2);
                     const data = {
