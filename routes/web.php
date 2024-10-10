@@ -7,7 +7,9 @@ use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\PropertyLedgerController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\VelzonRoutesController;
+use App\Jobs\SendEmailJob;
 use App\Models\LandDevelopment;
+use App\Models\User;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -23,6 +25,13 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified',])->group(function () {
     
+    Route::get('test', function(){
+        $user = User::first();
+
+        SendEmailJob::dispatch($user);
+        return 'Done';
+    });
+
     Route::controller(VelzonRoutesController::class)->group(function () {
 
         // dashboards
@@ -34,8 +43,8 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified',
         // Route::get("/pages/coming-soon", "pages_coming_soon"); 
 
         // auth sample page routes
-        // Route::get("/auth/signin-basic", "auth_signin_basic");
-        // Route::get("/auth/signin-cover", "auth_signin_cover");
+        Route::get("/auth/signin-basic", "auth_signin_basic");
+        Route::get("/auth/signin-cover", "auth_signin_cover");
         // Route::get("/auth/signup-basic", "auth_signup_basic");
         // Route::get("/auth/signup-cover", "auth_signup_cover");
         // Route::get("/auth/reset-pwd-basic", "auth_reset_pwd_basic");

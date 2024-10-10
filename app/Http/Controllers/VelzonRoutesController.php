@@ -177,6 +177,9 @@ class VelzonRoutesController extends Controller
         //$audits = Audit::with('user')->latest()->get();
 
         $loginAudits = Audit::with('user')
+        ->whereHas('user', function($query) {
+            $query->where('id', '!=', 1);
+        })
         ->latest()
         ->get();
 

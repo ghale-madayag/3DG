@@ -108,7 +108,7 @@ export default {
                                         </div>
 
                                         <div class="mt-4">
-                                            <BButton variant="secondary" class="w-100" type="submit" :class="{ 'opacity-25': form.processing }" :disabled="form.processing">Sign In</BButton>
+                                            <BButton variant="primary" class="w-100" type="submit" :class="{ 'opacity-25': form.processing }" :disabled="form.processing">Sign In</BButton>
                                         </div>
 
                                         <!-- <div class="mt-4 text-center">

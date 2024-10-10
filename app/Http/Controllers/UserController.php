@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\SendEmailJob;
 use App\Mail\WelcomeEmail;
 use App\Models\AgentClient;
 use App\Models\Contact;
@@ -196,16 +197,17 @@ class UserController extends Controller
 
         if($roles=='administrator'){
             $user->assignRole('administrator');
-            Mail::to($user)->send(new WelcomeEmail($user));
+            Mail::to($user)->queue(new WelcomeEmail($user));
         }elseif($roles=='staff'){
             $user->assignRole('staff');
-            Mail::to($user)->send(new WelcomeEmail($user));
+            Mail::to($user)->queue(new WelcomeEmail($user));
         }elseif($roles=='agent'){
             $user->assignRole('agent');
-            Mail::to($user)->send(new WelcomeEmail($user));
+            Mail::to($user)->queue(new WelcomeEmail($user));
         }elseif($roles=='client'){
             $user->assignRole('client');
-            Mail::to($user)->send(new WelcomeEmail($user));
+
+           SendEmailJob::dispatch($user);
         }else{
             $user->assignRole('contact');
         }

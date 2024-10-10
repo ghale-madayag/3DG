@@ -41,11 +41,11 @@
                                                 ₱<span class="counter-value">{{ formatNumber(paid.total_amount)
                                                     }}</span>
                                             </h4>
-                                            <span class="badge bg-light-subtle me-1 text-primary">0</span>
+                                            <span class="badge bg-secondary me-1 text-primary">0</span>
                                             <span class="text-light">Paid by clients</span>
                                         </div>
                                         <div class="avatar-sm flex-shrink-0">
-                                            <span class="avatar-title bg-light-subtle rounded fs-3">
+                                            <span class="avatar-title bg-secondary rounded fs-3">
                                                 <i class="ri-money-dollar-circle-line text-primary"></i>
                                             </span>
                                         </div>
@@ -58,10 +58,10 @@
                         <div class="col-xl-3 col-md-6">
                             <!-- card -->
                             <div class="card card-animate">
-                                <div class="card-body">
+                                <div class="card-body bg-secondary">
                                     <div class="d-flex align-items-center">
                                         <div class="flex-grow-1">
-                                            <p class="text-uppercase fw-medium text-muted mb-0">
+                                            <p class="text-uppercase fw-medium text-primary mb-0">
                                                 Expected Revenue
                                             </p>
                                         </div>
@@ -81,8 +81,8 @@
                                             <span class="text-muted">Paid by clients</span>
                                         </div>
                                         <div class="avatar-sm flex-shrink-0">
-                                            <span class="avatar-title bg-primary-subtle rounded fs-3">
-                                                <i class="ri-money-dollar-circle-line text-primary"></i>
+                                            <span class="avatar-title bg-primary rounded fs-3">
+                                                <i class="ri-money-dollar-circle-line text-secondary"></i>
                                             </span>
                                         </div>
                                     </div>

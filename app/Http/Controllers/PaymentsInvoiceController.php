@@ -414,7 +414,7 @@ class PaymentsInvoiceController extends Controller
 
                 $clientName = $client->fname;
 
-                $sent = Mail::to($request->email)->send(new SendInvoice($invoice,$clientName));
+                $sent = Mail::to($request->email)->queue(new SendInvoice($invoice,$clientName));
 
                 if ($sent === null) {
                     // Email sending failed

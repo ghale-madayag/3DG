@@ -59,7 +59,7 @@ class ContactController extends Controller
         $user = $this->creator->create(array_merge($request->only(['name', 'email']), ['password' => $password]));
         $user['password'] = $password;
 
-        Mail::to($user)->send(new WelcomeEmail($user));
+        Mail::to($user)->queue(new WelcomeEmail($user));
 
         dd($user);
 

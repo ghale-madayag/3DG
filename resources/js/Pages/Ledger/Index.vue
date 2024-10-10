@@ -314,7 +314,7 @@
                                                     ₱ {{ formatNumber(data.end_balance) }}
                                                 </td>
                                                 <td class="text-end">
-                                                    <span class="badge text-uppercase" :class="{'bg-warning-subtle text-warning': data.payment_status === 'Unpaid', 'bg-success-subtle text-success': data.payment_status == 'Paid'}">{{ data.payment_status }}</span>
+                                                    <span class="badge text-uppercase" :class="{'bg-warning-subtle text-danger': data.payment_status === 'Unpaid', 'bg-success-subtle text-success': data.payment_status == 'Paid'}">{{ data.payment_status }}</span>
                                                 </td>
                                             </tr>
                                         </tbody>
