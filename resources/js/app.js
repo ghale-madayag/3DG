@@ -28,7 +28,7 @@ AOS.init({
 });
 
 createInertiaApp({
-    title: title => title ? `${title} | 3DG Realty Development` : '3DG Realty Development',
+    title: title => title ? `${title} | Real Estate` : 'Real Estate',
     resolve: (name) => resolvePageComponent(`./Pages/${name}.vue`, import.meta.glob('./Pages/**/*.vue')),
     setup({ el, App, props, plugin }) {
         return createApp({ render: () => h(App, props) })

@@ -1196,7 +1196,7 @@
         blocks.value.push(initialBlockValue); // Start new block at 5
         form.block.push(initialBlockValue);
         form.errors.error = null;
-        phases = [];
+        phases.value = [];
     };
 
     const openModalLot = () => {
